@@ -2,13 +2,23 @@ package com.stephapps.smsxposed;
 
 import static de.robv.android.xposed.XposedHelpers.findAndHookMethod;
 
+import java.io.ByteArrayInputStream;
+
 import com.stephapps.smsxposed.misc.Constants;
 
 import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
+import android.content.res.XModuleResources;
+import android.content.res.XResources;
 import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.graphics.PorterDuff.Mode;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.provider.Settings;
 import android.text.Editable;
@@ -18,13 +28,16 @@ import android.util.Log;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 
+import de.robv.android.xposed.IXposedHookInitPackageResources;
 import de.robv.android.xposed.IXposedHookLoadPackage;
+import de.robv.android.xposed.IXposedHookZygoteInit;
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XSharedPreferences;
 import de.robv.android.xposed.XposedHelpers;
+import de.robv.android.xposed.callbacks.XC_InitPackageResources.InitPackageResourcesParam;
 import de.robv.android.xposed.callbacks.XC_LoadPackage.LoadPackageParam;
 
-public class SMSXposed implements IXposedHookLoadPackage
+public class SMSXposed implements IXposedHookZygoteInit, IXposedHookLoadPackage, IXposedHookInitPackageResources
 {
 	private EditText mEditText ;
 	private String[] mSources , mDestinations, mDelayedSources, mDelayedDestinations;
@@ -34,9 +47,38 @@ public class SMSXposed implements IXposedHookLoadPackage
 	private TextWatcher mOriginalTextWatcher;
 	private Context mContext;
 	private String mPoint;
-	
+	private Drawable mSMSSmallIcon;
 	private static final String PACKAGE_NAME = SMSXposed.class.getPackage().getName();
 
+	private static String MODULE_PATH = null;
+	
+	@Override
+	public void initZygote(StartupParam startupParam) throws Throwable {
+		MODULE_PATH = startupParam.modulePath;
+	}
+	
+	 @Override
+	 public void handleInitPackageResources(InitPackageResourcesParam resparam) throws Throwable {
+		if (!(resparam.packageName.equals("com.android.mms")))	return;
+
+//		Resources tweakboxRes = XModuleResources.createInstance(MODULE_PATH, null);
+//		byte[] b = XposedHelpers.assetAsByteArray(tweakboxRes, "stat_notify_sms.png");
+//		ByteArrayInputStream is = new ByteArrayInputStream(b);
+//		mSMSSmallIcon = resizDrawable(Drawable.createFromStream(is, "stat_notify_sms.png"));
+//		
+//		
+//		//XModuleResources modRes = XModuleResources.createInstance(MODULE_PATH, resparam.res);
+//		//resparam.res.setReplacement("com.android.mms", "drawable", "stat_notify_sms", modRes.fwd(R.drawable.stat_notify_sms));
+//		resparam.res.setReplacement("com.android.mms", "drawable", "stat_notify_sms", new XResources.DrawableLoader() {
+//			@Override
+//			public Drawable newDrawable(XResources res, int id) throws Throwable {
+//				Drawable d = mSMSSmallIcon.getConstantState().newDrawable();
+//				d.setColorFilter(0xFFFF0000,Mode.ADD);
+//				return d;
+//			}
+//		});
+	}
+	
     public void handleLoadPackage(final LoadPackageParam lpparam) throws Throwable 
     {  	
     	if (!(lpparam.packageName.equals("com.android.mms")))	return;
@@ -308,6 +350,12 @@ public class SMSXposed implements IXposedHookLoadPackage
         for(int i=0;i<size;i++)  
             array[i] = prefs.getString(arrayName + "_" + i, null);  
         return array; 
+    }
+    
+    private Drawable resizDrawable(Drawable image) {
+        Bitmap b = ((BitmapDrawable)image).getBitmap();
+        Bitmap bitmapResized = Bitmap.createScaledBitmap(b, 38, 38, false);
+        return new BitmapDrawable(bitmapResized);
     }
     
 }

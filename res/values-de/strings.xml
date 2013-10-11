@@ -16,9 +16,19 @@
         <item>Fragezeichen</item>
         <item>Komma</item>
         <item>Punkt</item>
+        <item>semikolon</item>
+        <item>ausrufezeichen</item>
+        <item>fragezeichen</item>
+        <item>komma</item>
+        <item>punkt</item>
     </string-array>
     
     <string-array name="symbols_array">
+        <item>;</item>
+        <item>!</item>
+        <item>"?"</item>
+        <item>,</item>
+        <item>.</item>
         <item>;</item>
         <item>!</item>
         <item>"?"</item>
