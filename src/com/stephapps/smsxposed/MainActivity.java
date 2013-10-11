@@ -45,14 +45,14 @@ public class MainActivity extends Activity {
 			SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getActivity());
 		    Editor edit = settings.edit();
 		    Resources res =  getActivity().getResources();
-		    Set<String> sources = new HashSet<String>(Arrays.asList(res.getStringArray(R.array.punctuation_array)));
-		    Set<String> destinations = new HashSet<String>(Arrays.asList(res.getStringArray(R.array.symbols_array)));
-		    Set<String> delayed_sources = new HashSet<String>(Arrays.asList(res.getStringArray(R.array.delayed_punctuation_array)));
-		    Set<String> delayed_destinations = new HashSet<String>(Arrays.asList(res.getStringArray(R.array.delayed_symbols_array)));
-		    edit.putStringSet(Constants.SOURCES, sources);
-		    edit.putStringSet(Constants.DESTINATIONS, destinations);
-		    edit.putStringSet(Constants.DELAYED_SOURCES, delayed_sources);
-		    edit.putStringSet(Constants.DELAYED_DESTINATIONS, delayed_destinations);
+		    String[] sources = res.getStringArray(R.array.punctuation_array);
+		    String[] destinations = res.getStringArray(R.array.symbols_array);
+		    String[] delayed_sources = res.getStringArray(R.array.delayed_punctuation_array);
+		    String[] delayed_destinations = res.getStringArray(R.array.delayed_symbols_array);
+		    saveArray(edit,Constants.SOURCES, sources);
+		    saveArray(edit,Constants.DESTINATIONS, destinations);
+		    saveArray(edit,Constants.DELAYED_SOURCES, delayed_sources);
+		    saveArray(edit,Constants.DELAYED_DESTINATIONS, delayed_destinations);
 		    edit.commit();
 		}
 
@@ -62,6 +62,13 @@ public class MainActivity extends Activity {
 			// TODO Auto-generated method stub
 			
 		}
+		
+		private static void saveArray(Editor edit, String name, String[] values)
+		{
+			edit.putInt(name+ "_size", values.length);
+		    for(int i=0;i<values.length;i++)
+		    	edit.putString(name+ "_" + i, values[i]);    
+		}
 	}
 
 	@Override
@@ -70,4 +77,8 @@ public class MainActivity extends Activity {
 		getMenuInflater().inflate(R.menu.main, menu);
 		return true;
 	}
+	
+	
+	
+	
 }

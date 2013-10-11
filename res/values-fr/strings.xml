@@ -9,6 +9,11 @@
     <string name="no_fullscreen_summary">Désactiver le clavier plein-écran en mode paysage </string>
     <string name="replace_punctuation_title">Ponctuation vocale</string>
     <string name="replace_punctuation_summary">Remplacer les mots par la ponctuation correspondante lors de la dictée vocale</string>
+    <string name="privacy_mode_title">Mode privé</string>
+    <string name="privacy_mode_summary">Cache l\'auteur et le texte lors de la récéption d\'une notification SMS</string>
+    <string name="unlimited_textbox_title">Hauteur de texte illimitée</string>
+    <string name="unlimited_textbox_summary">Enlève la limite de 3 lignes de hauteur pour le cadre d\'édition de SMS </string>
+    
     
     <string-array name="punctuation_array">
         <item>point virgule</item>
@@ -20,7 +25,7 @@
     <string-array name="symbols_array">
         <item>;</item>
         <item>!</item>
-        <item>\?</item>
+        <item>"?"</item>
         <item>,</item>
     </string-array>
     

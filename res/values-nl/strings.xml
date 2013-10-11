@@ -21,7 +21,7 @@
     <string-array name="symbols_array">
         <item>;</item>
         <item>!</item>
-        <item>\?</item>
+        <item>"?"</item>
         <item>,</item>
         <item>.</item>
     </string-array>

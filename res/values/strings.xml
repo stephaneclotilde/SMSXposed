@@ -9,5 +9,10 @@
     <string name="no_fullscreen_summary">Disable Fullscreen for keyboard in Landscape mode </string>
     <string name="replace_punctuation_title">Voice Punctuation</string>
     <string name="replace_punctuation_summary">Replace words by corresponding punctuations in voice input</string>
+    <string name="privacy_mode_title">Privacy mode</string>
+    <string name="privacy_mode_summary">Hides the sender and text message when receiving a SMS notification</string>
+    <string name="unlimited_textbox_title">Unlimited Textbox</string>
+    <string name="unlimited_textbox_summary">Removes the 3-lines height limit for the SMS typing box</string>
+    
     
 </resources>

@@ -2,38 +2,25 @@ package com.stephapps.smsxposed;
 
 import static de.robv.android.xposed.XposedHelpers.findAndHookMethod;
 
-import java.lang.reflect.Field;
-import java.util.List;
-
 import com.stephapps.smsxposed.misc.Constants;
 
 import android.app.Activity;
-import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
-import android.os.Bundle;
 import android.os.Handler;
 import android.provider.Settings;
 import android.text.Editable;
 import android.text.InputType;
-import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
-import android.view.ViewGroup.LayoutParams;
 import android.view.inputmethod.EditorInfo;
-import android.view.inputmethod.InputMethodInfo;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import de.robv.android.xposed.IXposedHookLoadPackage;
 import de.robv.android.xposed.XC_MethodHook;
-import de.robv.android.xposed.XC_MethodReplacement;
 import de.robv.android.xposed.XSharedPreferences;
-import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage.LoadPackageParam;
 
@@ -53,30 +40,31 @@ public class SMSXposed implements IXposedHookLoadPackage
     public void handleLoadPackage(final LoadPackageParam lpparam) throws Throwable 
     {  	
     	if (!(lpparam.packageName.equals("com.android.mms")))	return;
-    	
-    	
+
     	XSharedPreferences prefs = new XSharedPreferences(PACKAGE_NAME);
     	final boolean replaceSmileyWithEnterButton = prefs.getBoolean("replace_smiley_with_enter_button", false);
     	final boolean noFullScreenWithKeyboard = prefs.getBoolean("no_fullscreen_with_keyboard", false);
     	final boolean replacePuncutationInVoiceDictation = prefs.getBoolean("replace_punctuation_in_voice_dictation", false);
-    	mSources 				= prefs.getStringSet(Constants.SOURCES, null).toArray(new String[0]);
-    	mDestinations 			= prefs.getStringSet(Constants.DESTINATIONS, null).toArray(new String[0]);
-    	mDelayedSources 		= prefs.getStringSet(Constants.DELAYED_SOURCES, null).toArray(new String[0]);
-    	mDelayedDestinations 	= prefs.getStringSet(Constants.DELAYED_DESTINATIONS, null).toArray(new String[0]);
+    	final boolean privacyMode = prefs.getBoolean("privacy_mode", false);
+    	final boolean unlimitedTextbox = prefs.getBoolean("unlimited_textbox", false);
+    	mSources 				= loadArray(Constants.SOURCES, prefs);
+    	mDestinations 			= loadArray(Constants.DESTINATIONS, prefs);
+    	mDelayedSources 		= loadArray(Constants.DELAYED_SOURCES, prefs);
+    	mDelayedDestinations 	= loadArray(Constants.DELAYED_DESTINATIONS, prefs);
 		
-    	findAndHookMethod("com.android.mms.ui.ComposeMessageActivity", lpparam.classLoader, "onCreate", Bundle.class, new XC_MethodHook() {
-    		@Override
-    		protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-    			Activity activity = (Activity)param.thisObject  ;  
-    			activity.setTheme(android.R.style.Theme_Holo);
-
-     		}
-    		
-    		@Override
-    		protected void afterHookedMethod(MethodHookParam param) throws Throwable 
-    		{
-    			    		}
-    	});
+//    	findAndHookMethod("com.android.mms.ui.ComposeMessageActivity", lpparam.classLoader, "onCreate", Bundle.class, new XC_MethodHook() {
+//    		@Override
+//    		protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+//    			Activity activity = (Activity)param.thisObject  ;  
+//    			activity.setTheme(android.R.style.Theme_Holo);
+//
+//     		}
+//    		
+//    		@Override
+//    		protected void afterHookedMethod(MethodHookParam param) throws Throwable 
+//    		{
+//    			    		}
+//    	});
 
     	findAndHookMethod("com.android.mms.ui.ComposeMessageActivity", lpparam.classLoader, "initResourceRefs", new XC_MethodHook() {
     		@Override
@@ -95,7 +83,7 @@ public class SMSXposed implements IXposedHookLoadPackage
     			
     			if (noFullScreenWithKeyboard) removeFullScreenInLandScapeMode();
     			
-    			mEditText.setMaxLines(Integer.MAX_VALUE);
+    			if (unlimitedTextbox) mEditText.setMaxLines(Integer.MAX_VALUE);
     			
     			if (replacePuncutationInVoiceDictation)
     			{
@@ -121,21 +109,23 @@ public class SMSXposed implements IXposedHookLoadPackage
     		}
     	});
     	
-    	 Class<?> contactClass = XposedHelpers.findClass("com.android.mms.data.Contact", lpparam.classLoader);
-    	findAndHookMethod("com.android.mms.transaction.MessagingNotification", lpparam.classLoader, "getNewMessageNotificationInfo", Context.class, boolean.class, String.class, String.class, String.class, long.class, long.class, Bitmap.class, contactClass, int.class, new XC_MethodHook() {
-    		@Override
-    		protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-    			Toast.makeText(mContext, "no sms text", Toast.LENGTH_SHORT).show();
-    			param.args[2] = "    ";
-    			param.args[3] = "    ";
-    			return;
-     		}
-    		@Override
-    		protected void afterHookedMethod(MethodHookParam param) throws Throwable 
-    		{
-    			
-    		}
-    	});
+    	if (privacyMode)
+    	{
+	    	Class<?> contactClass = XposedHelpers.findClass("com.android.mms.data.Contact", lpparam.classLoader);
+	    	findAndHookMethod("com.android.mms.transaction.MessagingNotification", lpparam.classLoader, "getNewMessageNotificationInfo", Context.class, boolean.class, String.class, String.class, String.class, long.class, long.class, Bitmap.class, contactClass, int.class, new XC_MethodHook() {
+	    		@Override
+	    		protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+	    			param.args[2] = "    ";
+	    			param.args[3] = "    ";
+	    			return;
+	     		}
+	    		@Override
+	    		protected void afterHookedMethod(MethodHookParam param) throws Throwable 
+	    		{
+	    			
+	    		}
+	    	});
+    	}
     	
     	if (replacePuncutationInVoiceDictation)
     	{
@@ -310,5 +300,14 @@ public class SMSXposed implements IXposedHookLoadPackage
 //            }
 //        }
 //    }
+    
+    private String[] loadArray(String arrayName, XSharedPreferences prefs)
+    {
+    	int size = prefs.getInt(arrayName + "_size", 0);  
+        String array[] = new String[size];  
+        for(int i=0;i<size;i++)  
+            array[i] = prefs.getString(arrayName + "_" + i, null);  
+        return array; 
+    }
     
 }
