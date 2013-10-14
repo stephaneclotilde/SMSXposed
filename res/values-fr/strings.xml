@@ -11,9 +11,18 @@
     <string name="replace_punctuation_summary">Remplacer les mots par la ponctuation correspondante lors de la dictée vocale</string>
     <string name="privacy_mode_title">Mode privé</string>
     <string name="privacy_mode_summary">Cache l\'auteur et le texte lors de la récéption d\'une notification SMS</string>
+    <string name="privacy_show_sender_title">Mode privé - afficher l\'auteur</string>
+    <string name="privacy_show_sender_summary">Affiche l\'auteur en mode privé</string>
     <string name="unlimited_textbox_title">Hauteur de texte illimitée</string>
     <string name="unlimited_textbox_summary">Enlève la limite de 3 lignes de hauteur pour le cadre d\'édition de SMS </string>
+    <string name="wake_on_new_SMS_title">Allumage lors d\'un nouveau SMS</string>
+    <string name="wake_on_new_SMS_summary">Allume l\'écran lors de la récéption d\'un nouveau SMS</string>
+    <string name="sms_icon_color_title">Choisir la couleur de l\'icone SMS</string>
+    <string name="sms_icon_color_summary">Choisir la couleur de l\'icone SMS dans la barre de statut</string>
     
+    <!-- Color Picker -->
+    <string name="dialog_color_picker">Sélecteur de couleur</string>
+    <string name="press_color_to_apply">Appuyez sur couleur pour appliquer</string>    
     
     <string-array name="punctuation_array">
         <item>point virgule</item>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">SMS Enter Button</string>
+    <string name="app_name">SMS Xposed</string>
     <string name="action_settings">Settings</string>
  	<string name="replace_smiley_title">Enter Key</string>
     <string name="replace_smiley_summary">Replace Smiley Button with Enter Button </string>

@@ -20,6 +20,8 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Handler;
+import android.os.PowerManager;
+import android.os.PowerManager.WakeLock;
 import android.provider.Settings;
 import android.text.Editable;
 import android.text.InputType;
@@ -27,6 +29,7 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
+import android.widget.ImageView;
 
 import de.robv.android.xposed.IXposedHookInitPackageResources;
 import de.robv.android.xposed.IXposedHookLoadPackage;
@@ -46,37 +49,41 @@ public class SMSXposed implements IXposedHookZygoteInit, IXposedHookLoadPackage,
 	private Object mComposeMsgActivityObject;
 	private TextWatcher mOriginalTextWatcher;
 	private Context mContext;
-	private String mPoint;
 	private Drawable mSMSSmallIcon;
 	private static final String PACKAGE_NAME = SMSXposed.class.getPackage().getName();
+	private WakeLock mSMSWakeLock;
 
 	private static String MODULE_PATH = null;
+	private int mSmsIconColor;
 	
 	@Override
 	public void initZygote(StartupParam startupParam) throws Throwable {
 		MODULE_PATH = startupParam.modulePath;
+		
+
 	}
 	
 	 @Override
 	 public void handleInitPackageResources(InitPackageResourcesParam resparam) throws Throwable {
 		if (!(resparam.packageName.equals("com.android.mms")))	return;
 
-//		Resources tweakboxRes = XModuleResources.createInstance(MODULE_PATH, null);
-//		byte[] b = XposedHelpers.assetAsByteArray(tweakboxRes, "stat_notify_sms.png");
-//		ByteArrayInputStream is = new ByteArrayInputStream(b);
-//		mSMSSmallIcon = resizDrawable(Drawable.createFromStream(is, "stat_notify_sms.png"));
-//		
-//		
-//		//XModuleResources modRes = XModuleResources.createInstance(MODULE_PATH, resparam.res);
-//		//resparam.res.setReplacement("com.android.mms", "drawable", "stat_notify_sms", modRes.fwd(R.drawable.stat_notify_sms));
-//		resparam.res.setReplacement("com.android.mms", "drawable", "stat_notify_sms", new XResources.DrawableLoader() {
-//			@Override
-//			public Drawable newDrawable(XResources res, int id) throws Throwable {
-//				Drawable d = mSMSSmallIcon.getConstantState().newDrawable();
-//				d.setColorFilter(0xFFFF0000,Mode.ADD);
-//				return d;
-//			}
-//		});
+	  	XSharedPreferences prefs = new XSharedPreferences(PACKAGE_NAME);
+	  	mSmsIconColor = prefs.getInt("sms_icon_color", Color.WHITE);
+ 		Resources tweakboxRes = XModuleResources.createInstance(MODULE_PATH, null);
+		byte[] b = XposedHelpers.assetAsByteArray(tweakboxRes, "stat_notify_sms.png");
+		ByteArrayInputStream is = new ByteArrayInputStream(b);
+		mSMSSmallIcon = resizDrawable(Drawable.createFromStream(is, "stat_notify_sms.png"));
+	
+		//XModuleResources modRes = XModuleResources.createInstance(MODULE_PATH, resparam.res);
+		//resparam.res.setReplacement("com.android.mms", "drawable", "stat_notify_sms", modRes.fwd(R.drawable.stat_notify_sms));
+		resparam.res.setReplacement("com.android.mms", "drawable", "stat_notify_sms", new XResources.DrawableLoader() {
+			@Override
+			public Drawable newDrawable(XResources res, int id) throws Throwable {
+				Drawable d = mSMSSmallIcon.getConstantState().newDrawable();
+				d.setColorFilter(mSmsIconColor,Mode.MULTIPLY );
+				return d;
+			}
+		});
 	}
 	
     public void handleLoadPackage(final LoadPackageParam lpparam) throws Throwable 
@@ -89,6 +96,8 @@ public class SMSXposed implements IXposedHookZygoteInit, IXposedHookLoadPackage,
     	final boolean replacePuncutationInVoiceDictation = prefs.getBoolean("replace_punctuation_in_voice_dictation", false);
     	final boolean privacyMode = prefs.getBoolean("privacy_mode", false);
     	final boolean unlimitedTextbox = prefs.getBoolean("unlimited_textbox", false);
+    	final boolean wakeOnNewSMS = prefs.getBoolean("wake_on_new_sms", false);
+    	final boolean showSender = prefs.getBoolean("privacy_show_sender", false);
     	mSources 				= loadArray(Constants.SOURCES, prefs);
     	mDestinations 			= loadArray(Constants.DESTINATIONS, prefs);
     	mDelayedSources 		= loadArray(Constants.DELAYED_SOURCES, prefs);
@@ -117,8 +126,7 @@ public class SMSXposed implements IXposedHookZygoteInit, IXposedHookLoadPackage,
     		protected void afterHookedMethod(MethodHookParam param) throws Throwable 
     		{
     			mContext = ((Activity)param.thisObject).getApplicationContext();
-    			
-    			
+
     			mEditText = (EditText) XposedHelpers.getObjectField(param.thisObject, "mTextEditor");
     			
     			if (replaceSmileyWithEnterButton) replaceSmileyKeyWithEnterKey();
@@ -151,14 +159,29 @@ public class SMSXposed implements IXposedHookZygoteInit, IXposedHookLoadPackage,
     		}
     	});
     	
-    	if (privacyMode)
+    	if (privacyMode||wakeOnNewSMS)
     	{
 	    	Class<?> contactClass = XposedHelpers.findClass("com.android.mms.data.Contact", lpparam.classLoader);
 	    	findAndHookMethod("com.android.mms.transaction.MessagingNotification", lpparam.classLoader, "getNewMessageNotificationInfo", Context.class, boolean.class, String.class, String.class, String.class, long.class, long.class, Bitmap.class, contactClass, int.class, new XC_MethodHook() {
 	    		@Override
 	    		protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-	    			param.args[2] = "    ";
-	    			param.args[3] = "    ";
+	    			if (wakeOnNewSMS)
+	    			{
+		    			PowerManager pm = (PowerManager) ((Context)param.args[0]).getSystemService(Context.POWER_SERVICE);
+		    			if (pm.isScreenOn())
+		    			{
+		    				mSMSWakeLock = pm.newWakeLock((PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.FULL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP | PowerManager.ON_AFTER_RELEASE), "TAG");
+		    				mSMSWakeLock.acquire();
+		    				mSMSWakeLock.release();
+		    			}
+	    			}
+	    	       
+	    			if (privacyMode)
+	    			{
+		    			if (!showSender) 
+		    				param.args[2] = "    ";
+		    			param.args[3] = "    ";
+	    			}
 	    			return;
 	     		}
 	    		@Override
@@ -354,7 +377,7 @@ public class SMSXposed implements IXposedHookZygoteInit, IXposedHookLoadPackage,
     
     private Drawable resizDrawable(Drawable image) {
         Bitmap b = ((BitmapDrawable)image).getBitmap();
-        Bitmap bitmapResized = Bitmap.createScaledBitmap(b, 38, 38, false);
+        Bitmap bitmapResized = Bitmap.createScaledBitmap(b, 48*2, 48*2, false);
         return new BitmapDrawable(bitmapResized);
     }
     

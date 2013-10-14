@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">SMS Enter Button</string>
+    <string name="app_name">SMS Xposed</string>
     <string name="action_settings">Settings</string>
  	<string name="replace_smiley_title">Enter Key</string>
     <string name="replace_smiley_summary">Replace Smiley Button with Enter Button </string>
@@ -11,8 +11,40 @@
     <string name="replace_punctuation_summary">Replace words by corresponding punctuations in voice input</string>
     <string name="privacy_mode_title">Privacy mode</string>
     <string name="privacy_mode_summary">Hides the sender and text message when receiving a SMS notification</string>
+    <string name="privacy_show_sender_title">Privacy - show Sender</string>
+    <string name="privacy_show_sender_summary">Shows the sender in privacy mode</string>
     <string name="unlimited_textbox_title">Unlimited Textbox</string>
     <string name="unlimited_textbox_summary">Removes the 3-lines height limit for the SMS typing box</string>
+    <string name="wake_on_new_SMS_title">Wake on new SMS</string>
+    <string name="wake_on_new_SMS_summary">Turns the screen on when receiving a new sms</string>
+    <string name="sms_icon_color_title">Choose SMS icon color</string>
+    <string name="sms_icon_color_summary">Choose the color of the sms icon in the status bar</string>
     
+    <string name="crash_toast_text">bug report</string>
     
+    <!-- Color Picker -->
+    <string name="dialog_color_picker">Color Picker</string>
+    <string name="press_color_to_apply">Press on Color to apply</string>    
+     
+    <string-array name="punctuation_array">
+        <item>semicolon</item>
+        <item>exclamation mark</item>
+        <item>question mark</item>
+        <item>comma</item>
+    </string-array>
+    
+    <string-array name="symbols_array">
+        <item>;</item>
+        <item>!</item>
+        <item>"?"</item>
+        <item>,</item>
+    </string-array>
+    
+    <string-array name="delayed_punctuation_array">
+        <item>point</item>
+    </string-array>
+    
+    <string-array name="delayed_symbols_array">
+        <item>.</item>
+    </string-array>
 </resources>

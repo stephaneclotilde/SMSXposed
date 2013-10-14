@@ -3,9 +3,28 @@
 
      <CheckBoxPreference
         android:defaultValue="false"
+        android:key="wake_on_new_sms"
+        android:summary="@string/wake_on_new_SMS_summary"
+        android:title="@string/wake_on_new_SMS_title" />
+     
+     <CheckBoxPreference
+        android:defaultValue="false"
         android:key="replace_smiley_with_enter_button"
         android:summary="@string/replace_smiley_summary"
         android:title="@string/replace_smiley_title" />
+     
+     <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="privacy_mode"
+        android:summary="@string/privacy_mode_summary"
+        android:title="@string/privacy_mode_title" />
+     
+      <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="privacy_show_sender"
+        android:summary="@string/privacy_show_sender_summary"
+        android:title="@string/privacy_show_sender_title"
+        android:dependency="privacy_mode" />
 
     <CheckBoxPreference
         android:defaultValue="false"
@@ -18,17 +37,17 @@
         android:key="replace_punctuation_in_voice_dictation"
         android:summary="@string/replace_punctuation_summary"
         android:title="@string/replace_punctuation_title" />
-    
-    <CheckBoxPreference
-        android:defaultValue="false"
-        android:key="privacy_mode"
-        android:summary="@string/privacy_mode_summary"
-        android:title="@string/privacy_mode_title" />
-    
+
     <CheckBoxPreference
         android:defaultValue="false"
         android:key="unlimited_textbox"
         android:summary="@string/unlimited_textbox_summary"
         android:title="@string/unlimited_textbox_title" />
+    
+    <net.margaritov.preference.colorpicker.ColorPickerPreference
+        android:key="sms_icon_color"
+        android:title="@string/sms_icon_color_title"
+        android:summary="@string/sms_icon_color_summary"
+        android:defaultValue="@integer/COLOR_WHITE" />
 
 </PreferenceScreen>

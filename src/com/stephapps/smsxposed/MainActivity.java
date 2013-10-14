@@ -9,8 +9,10 @@ import com.stephapps.smsxposed.misc.Constants;
 
 import android.os.Bundle;
 import android.preference.EditTextPreference;
+import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
+import android.preference.PreferenceScreen;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -34,16 +36,17 @@ public class MainActivity extends Activity {
 	
 	public static class PrefsFragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener {
 		@Override
-		public void onCreate(Bundle savedInstanceState) {
+		public void onCreate(Bundle savedInstanceState) 
+		{
 			super.onCreate(savedInstanceState);
-			
+	
 			// this is important because although the handler classes that read these settings
 			// are in the same package, they are executed in the context of the hooked package
 			getPreferenceManager().setSharedPreferencesMode(MODE_WORLD_READABLE);
 			addPreferencesFromResource(R.xml.preferences); 
 			
-			SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getActivity());
-		    Editor edit = settings.edit();
+			SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getActivity());			
+			Editor edit = settings.edit();
 		    Resources res =  getActivity().getResources();
 		    String[] sources = res.getStringArray(R.array.punctuation_array);
 		    String[] destinations = res.getStringArray(R.array.symbols_array);
@@ -54,13 +57,20 @@ public class MainActivity extends Activity {
 		    saveArray(edit,Constants.DELAYED_SOURCES, delayed_sources);
 		    saveArray(edit,Constants.DELAYED_DESTINATIONS, delayed_destinations);
 		    edit.commit();
+		    
+//		    boolean isChecked = settings.getBoolean("privacy_mode", false);
+//			Preference preference = getPreferenceScreen().findPreference("privacy_show_sender");
+//			preference.setEnabled(isChecked);
+//			
 		}
 
 		@Override
-		public void onSharedPreferenceChanged(
-				SharedPreferences sharedPreferences, String key) {
-			// TODO Auto-generated method stub
-			
+		public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+//			if (key.equals("privacy_mode"))
+//			{
+//				boolean isChecked = sharedPreferences.getBoolean("privacy_mode", false);
+//				getPreferenceScreen().findPreference("privacy_show_sender").setEnabled(isChecked);
+//			}
 		}
 		
 		private static void saveArray(Editor edit, String name, String[] values)
