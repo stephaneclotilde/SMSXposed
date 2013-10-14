@@ -66,11 +66,23 @@ public class MainActivity extends Activity {
 
 		@Override
 		public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-//			if (key.equals("privacy_mode"))
-//			{
-//				boolean isChecked = sharedPreferences.getBoolean("privacy_mode", false);
-//				getPreferenceScreen().findPreference("privacy_show_sender").setEnabled(isChecked);
-//			}
+			if (key.equals("sms_icon_color"))
+			{
+				Toast.makeText(getActivity().getApplicationContext(),getString(R.string.changes_apply_on_reboot),Toast.LENGTH_SHORT).show();
+			}
+		}
+		
+		@Override
+		public void onResume() {
+		    super.onResume();
+		    getPreferenceManager().getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
+
+		}
+
+		@Override
+		public void onPause() {
+		    getPreferenceManager().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this);
+		    super.onPause();
 		}
 		
 		private static void saveArray(Editor edit, String name, String[] values)

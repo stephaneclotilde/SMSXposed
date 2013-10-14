@@ -19,7 +19,7 @@
     <string name="wake_on_new_SMS_summary">Turns the screen on when receiving a new sms</string>
     <string name="sms_icon_color_title">Choose SMS icon color</string>
     <string name="sms_icon_color_summary">Choose the color of the sms icon in the status bar</string>
-    
+    <string name="changes_apply_on_reboot">This change will apply after a reboot.</string>
     <string name="crash_toast_text">bug report</string>
     
     <!-- Color Picker -->
