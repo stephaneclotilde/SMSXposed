@@ -52,6 +52,7 @@ public class SMSXposed implements IXposedHookZygoteInit, IXposedHookLoadPackage,
 	private Drawable mSMSSmallIcon;
 	private static final String PACKAGE_NAME = SMSXposed.class.getPackage().getName();
 	private WakeLock mSMSWakeLock;
+	private boolean mIsCustomSMSIconColorActivated=false;
 
 	private static String MODULE_PATH = null;
 	private int mSmsIconColor;
@@ -67,23 +68,27 @@ public class SMSXposed implements IXposedHookZygoteInit, IXposedHookLoadPackage,
 	 public void handleInitPackageResources(InitPackageResourcesParam resparam) throws Throwable {
 		if (!(resparam.packageName.equals("com.android.mms")))	return;
 
-	  	XSharedPreferences prefs = new XSharedPreferences(PACKAGE_NAME);
-	  	mSmsIconColor = prefs.getInt("sms_icon_color", Color.WHITE);
- 		Resources tweakboxRes = XModuleResources.createInstance(MODULE_PATH, null);
-		byte[] b = XposedHelpers.assetAsByteArray(tweakboxRes, "stat_notify_sms.png");
-		ByteArrayInputStream is = new ByteArrayInputStream(b);
-		mSMSSmallIcon = resizDrawable(Drawable.createFromStream(is, "stat_notify_sms.png"));
-	
-		//XModuleResources modRes = XModuleResources.createInstance(MODULE_PATH, resparam.res);
-		//resparam.res.setReplacement("com.android.mms", "drawable", "stat_notify_sms", modRes.fwd(R.drawable.stat_notify_sms));
-		resparam.res.setReplacement("com.android.mms", "drawable", "stat_notify_sms", new XResources.DrawableLoader() {
-			@Override
-			public Drawable newDrawable(XResources res, int id) throws Throwable {
-				Drawable d = mSMSSmallIcon.getConstantState().newDrawable();
-				d.setColorFilter(mSmsIconColor,Mode.MULTIPLY );
-				return d;
-			}
-		});
+		XSharedPreferences prefs = new XSharedPreferences(PACKAGE_NAME);
+    	
+		if (prefs.getBoolean("sms_custom_icon_color_toggle", false))
+		{
+		  	mSmsIconColor = prefs.getInt("sms_icon_color", Color.WHITE);
+	 		Resources tweakboxRes = XModuleResources.createInstance(MODULE_PATH, null);
+			byte[] b = XposedHelpers.assetAsByteArray(tweakboxRes, "stat_notify_sms.png");
+			ByteArrayInputStream is = new ByteArrayInputStream(b);
+			mSMSSmallIcon = resizDrawable(Drawable.createFromStream(is, "stat_notify_sms.png"),prefs.getFloat("density",2.0f));
+		
+			//XModuleResources modRes = XModuleResources.createInstance(MODULE_PATH, resparam.res);
+			//resparam.res.setReplacement("com.android.mms", "drawable", "stat_notify_sms", modRes.fwd(R.drawable.stat_notify_sms));
+			resparam.res.setReplacement("com.android.mms", "drawable", "stat_notify_sms", new XResources.DrawableLoader() {
+				@Override
+				public Drawable newDrawable(XResources res, int id) throws Throwable {
+					Drawable d = mSMSSmallIcon.getConstantState().newDrawable();
+					d.setColorFilter(mSmsIconColor,Mode.MULTIPLY );
+					return d;
+				}
+			});
+		}
 	}
 	
     public void handleLoadPackage(final LoadPackageParam lpparam) throws Throwable 
@@ -103,19 +108,7 @@ public class SMSXposed implements IXposedHookZygoteInit, IXposedHookLoadPackage,
     	mDelayedSources 		= loadArray(Constants.DELAYED_SOURCES, prefs);
     	mDelayedDestinations 	= loadArray(Constants.DELAYED_DESTINATIONS, prefs);
 		
-//    	findAndHookMethod("com.android.mms.ui.ComposeMessageActivity", lpparam.classLoader, "onCreate", Bundle.class, new XC_MethodHook() {
-//    		@Override
-//    		protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-//    			Activity activity = (Activity)param.thisObject  ;  
-//    			activity.setTheme(android.R.style.Theme_Holo);
-//
-//     		}
-//    		
-//    		@Override
-//    		protected void afterHookedMethod(MethodHookParam param) throws Throwable 
-//    		{
-//    			    		}
-//    	});
+
 
     	findAndHookMethod("com.android.mms.ui.ComposeMessageActivity", lpparam.classLoader, "initResourceRefs", new XC_MethodHook() {
     		@Override
@@ -375,9 +368,9 @@ public class SMSXposed implements IXposedHookZygoteInit, IXposedHookLoadPackage,
         return array; 
     }
     
-    private Drawable resizDrawable(Drawable image) {
+    private Drawable resizDrawable(Drawable image, float density) {
         Bitmap b = ((BitmapDrawable)image).getBitmap();
-        Bitmap bitmapResized = Bitmap.createScaledBitmap(b, 48*2, 48*2, false);
+        Bitmap bitmapResized = Bitmap.createScaledBitmap(b, (int)(48*density), (int)(48*density), false);
         return new BitmapDrawable(bitmapResized);
     }
     

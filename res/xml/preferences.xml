@@ -44,10 +44,17 @@
         android:summary="@string/unlimited_textbox_summary"
         android:title="@string/unlimited_textbox_title" />
     
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="sms_custom_icon_color_toggle"
+        android:summary="@string/sms_custom_icon_color_toggle_summary"
+        android:title="@string/sms_custom_icon_color_toggle_title" />
+    
     <net.margaritov.preference.colorpicker.ColorPickerPreference
         android:key="sms_icon_color"
         android:title="@string/sms_icon_color_title"
         android:summary="@string/sms_icon_color_summary"
-        android:defaultValue="@integer/COLOR_WHITE" />
+        android:defaultValue="@integer/COLOR_WHITE"
+        android:dependency="sms_custom_icon_color_toggle" />
 
 </PreferenceScreen>

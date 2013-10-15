@@ -66,9 +66,15 @@ public class MainActivity extends Activity {
 
 		@Override
 		public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-			if (key.equals("sms_icon_color"))
+			if (key.equals("sms_custom_icon_color_toggle"))
 			{
 				Toast.makeText(getActivity().getApplicationContext(),getString(R.string.changes_apply_on_reboot),Toast.LENGTH_SHORT).show();
+				if (sharedPreferences.getFloat("density", -1)!=-1)
+				{
+					Editor edit = sharedPreferences.edit();
+					edit.putFloat("density", getResources().getDisplayMetrics().density);
+					edit.commit();
+				}
 			}
 		}
 		
