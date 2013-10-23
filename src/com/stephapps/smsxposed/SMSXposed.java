@@ -92,7 +92,12 @@ public class SMSXposed implements IXposedHookZygoteInit, IXposedHookLoadPackage,
 	}
 	
     public void handleLoadPackage(final LoadPackageParam lpparam) throws Throwable 
-    {  	
+    { 
+    	Log.i("SMSXposed","package"+lpparam.packageName);
+    	if (!(lpparam.packageName.equals("com.android.app"))){
+    		Log.i("SMSXposed","android.app loaded");
+    		return;
+    	}
     	if (!(lpparam.packageName.equals("com.android.mms")))	return;
 
     	XSharedPreferences prefs = new XSharedPreferences(PACKAGE_NAME);
