@@ -20,6 +20,7 @@
     <string name="sms_icon_color_title">Choisir la couleur de l\'icone SMS</string>
     <string name="sms_icon_color_summary">Choisir la couleur de l\'icone SMS dans la barre de statut</string>
     <string name="changes_apply_on_reboot">Ce changement sera appliqué après un redémarrage.</string>
+    <string name="to_recipe">A: </string> 
     
     <!-- Color Picker -->
     <string name="dialog_color_picker">Sélecteur de couleur</string>

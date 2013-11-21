@@ -29,11 +29,13 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
+import android.telephony.gsm.SmsMessage;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
@@ -75,78 +77,30 @@ public class SMSXposed implements IXposedHookZygoteInit, IXposedHookLoadPackage,
 	private int mSmsIconColor;
 	
 	@Override
-	public void initZygote(StartupParam startupParam) throws Throwable {
+	public void initZygote(StartupParam startupParam) throws Throwable 
+	{
 		MODULE_PATH = startupParam.modulePath;
 		
         Log.i("SMSXposed","initZygote");
-        final Class<?> notificationManagerClass = XposedHelpers.findClass("android.app.NotificationManager", null);
+        
+        addButtonsToSmsNotifications(); 
+        
+        final Class<?> contextClass = XposedHelpers.findClass("android.content.Context", null);
 
-        findAndHookMethod(notificationManagerClass, "notify", String.class, int.class, Notification.class, new XC_MethodHook() {
+        findAndHookMethod(contextClass, "sendOrderedBroadcast", Intent.class, String.class, BroadcastReceiver.class,
+        								Handler.class, int.class, String.class,Bundle.class, new XC_MethodHook() {
 			@Override
     		protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-				Log.i("SMSXposed","notify hooked");
-				Context context = (Context) XposedHelpers.getObjectField(param.thisObject, "mContext");
-    			
-				Log.i("SMSXposed",""+context.getPackageName());
-				//final boolean smsWillBeNotified = prefs.getBoolean("sms_will_be_notified", false);
-		    	if (context.getPackageName().equals("com.android.mms"))
-		    	{
-		    		Log.i("SMSXposed","notification succesfully intercepted");
-    	    		
-		    		//XSharedPreferences prefs = new XSharedPreferences(PACKAGE_NAME);
-		    		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-		    		final String smsMsg = prefs.getString("sms_msg", null);
-		        	final String smsSender = prefs.getString("sms_sender", null);
-			    	Log.i("SMSXposed","sms sender"+smsSender);
-		    		String uri = "tel:" + smsSender ;
-		    		
-		    		Intent callIntent = new Intent(Intent.ACTION_CALL);
-		    		callIntent.setData(Uri.parse(uri));
-		    		PendingIntent pendingCallIntent = PendingIntent.getActivity(context, 0, callIntent, 0);
-		    		
-		    		Intent respondIntent = new Intent(); 
-		    		respondIntent.setAction("com.stephapps.smsxposed.quickresponse_receiver");
-		    		PendingIntent pendingRespondIntent = PendingIntent.getBroadcast(context, 0, respondIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-		    		
-		    		 //Intent markAsReadIntent = new Intent("com.stephapps.xposedsms.markasread_action");
-		    		Intent markAsReadIntent = new Intent();
-		    		markAsReadIntent.putExtra("sms_sender", smsSender);
-		    		markAsReadIntent.putExtra("sms_msg", smsMsg);
-		    		markAsReadIntent.setAction("com.stephapps.smsxposed.markasread_receiver");
-		    	    PendingIntent pendingIntentMarkAsRead = PendingIntent.getBroadcast(context, 0, markAsReadIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-		    	     
-//		    		Intent respondIntent = new Intent(Intent.ACTION_VIEW); 
-//		    		respondIntent.setData(Uri.parse("content://mms-sms/conversations/"+prefs.getString("sms_threadId", null)));  
-//		    		PendingIntent pendingRespondIntent = PendingIntent.getActivity(context, 0, callIntent, 0);
-
-		    	    Notification paramNotif = (Notification)param.args[2];
-		    		
-		    		CharSequence[] notificationsText = getNotificationText2(paramNotif.contentView, context);
-		    		Notification newNotif = new Notification.Builder(mContext)
-		    		.setWhen(paramNotif.when)
-		            .setTicker(paramNotif.tickerText)
-		            .setLargeIcon(paramNotif.largeIcon)
-		            .setSmallIcon(paramNotif.icon)
-		            .setContentTitle(notificationsText[0])
-		            .setContentIntent(paramNotif.contentIntent)
-		            .setPriority(paramNotif.priority)
-		            .setSound(paramNotif.sound)
-		            .setDefaults(paramNotif.defaults)
-		            .setDeleteIntent(paramNotif.deleteIntent)
-		            .setContentText(notificationsText[2])
-		            .addAction(R.drawable.ic_launcher, "Call", pendingCallIntent)
-		            .addAction(R.drawable.ic_launcher, "Respond", pendingRespondIntent)
-		            .addAction(R.drawable.ic_launcher, "Mark as read", pendingIntentMarkAsRead).build();
-		    		
-		    		param.args[2] = newNotif;
-
-		    	}
-     		}
-    		@Override
-    		protected void afterHookedMethod(MethodHookParam param) throws Throwable 
-    		{
-    		}
-    	});
+				Log.i("SMSXposed","sendOrderedBroadcast hooked "+((Context)param.thisObject).getPackageName());
+				
+			}
+			
+			@Override
+    		protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+				Log.i("SMSXposed","sendOrderedBroadcast hooked");
+			}
+        });
+		
 	}
 	
 	 @Override
@@ -182,8 +136,9 @@ public class SMSXposed implements IXposedHookZygoteInit, IXposedHookLoadPackage,
     	
     	if (lpparam.packageName.equals("com.android.mms"))
 	    	hookSMS(lpparam);
-    	else
-    		return;
+    	else if (lpparam.packageName.equals("com.google.android.talk"))
+    		hookHangouts(lpparam);
+    	return;
 
     	
     }
@@ -318,6 +273,106 @@ public class SMSXposed implements IXposedHookZygoteInit, IXposedHookLoadPackage,
 //    		
 //    		}
 //    	});
+    }
+    
+    private void hookHangouts(final LoadPackageParam lpparam)
+    {
+//    	findAndHookMethod("com.google.android.apps.babel.ui.sms.SMSReceiver", lpparam.classLoader, "onReceive", Context.class, Intent.class, new XC_MethodHook() {
+//    		@Override
+//    		protected void beforeHookedMethod(MethodHookParam param) throws Throwable 
+//    		{
+//    			Bundle extras = ((Intent)param.args[1]).getExtras();
+//    			if (extras==null) return;
+//    			
+//    			Object obj1 = ((Object) ((Object[])(Object[])((Bundle) (obj1)).get("pdus")));
+//    	        if (obj1.length <= 0) return;
+//    	        
+//    	        Object obj2;
+//    	        String s2;
+//    	        obj2 = SmsMessage.createFromPdu((byte[])(byte[])obj1[0]);
+//    	        
+//     		}
+//    		@Override
+//    		protected void afterHookedMethod(MethodHookParam param) throws Throwable 
+//    		{
+//    		
+//    		}
+//    	});
+    }
+    
+    private void addButtonsToSmsNotifications()
+    {
+    	final Class<?> notificationManagerClass = XposedHelpers.findClass("android.app.NotificationManager", null);
+
+    	findAndHookMethod(notificationManagerClass, "notify", String.class, int.class, Notification.class, new XC_MethodHook() {
+			@Override
+    		protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+				Log.i("SMSXposed","notify hooked");
+				
+				Context context = (Context) XposedHelpers.getObjectField(param.thisObject, "mContext");
+    			
+				Log.i("SMSXposed",""+context.getPackageName());
+				//final boolean smsWillBeNotified = prefs.getBoolean("sms_will_be_notified", false);
+		    	if (context.getPackageName().equals("com.android.mms")||context.getPackageName().equals("com.google.android.talk"))
+		    	{
+		    		Log.i("SMSXposed","notification succesfully intercepted");
+    	    		
+		    		//XSharedPreferences prefs = new XSharedPreferences(PACKAGE_NAME);
+		    		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		    		final String smsMsg = prefs.getString("sms_msg", null);
+		        	final String smsSender = prefs.getString("sms_sender", null);
+			    	Log.i("SMSXposed","sms sender"+smsSender);
+		    		String uri = "tel:" + smsSender ;
+		    		
+		    		Intent callIntent = new Intent(Intent.ACTION_CALL);
+		    		callIntent.setData(Uri.parse(uri));
+		    		PendingIntent pendingCallIntent = PendingIntent.getActivity(context, 0, callIntent, 0);
+		    		
+		    		Intent respondIntent = new Intent(); 
+		    		respondIntent.putExtra("sms_sender", smsSender);
+		    		respondIntent.putExtra("sms_msg", smsMsg);
+		    		respondIntent.setAction("com.stephapps.smsxposed.quickresponse_receiver");
+		    		PendingIntent pendingRespondIntent = PendingIntent.getBroadcast(context, 0, respondIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+		    		
+		    		 //Intent markAsReadIntent = new Intent("com.stephapps.xposedsms.markasread_action");
+		    		Intent markAsReadIntent = new Intent();
+		    		markAsReadIntent.putExtra("sms_sender", smsSender);
+		    		markAsReadIntent.putExtra("sms_msg", smsMsg);
+		    		markAsReadIntent.setAction("com.stephapps.smsxposed.markasread_receiver");
+		    	    PendingIntent pendingIntentMarkAsRead = PendingIntent.getBroadcast(context, 0, markAsReadIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+		    	     
+//		    		Intent respondIntent = new Intent(Intent.ACTION_VIEW); 
+//		    		respondIntent.setData(Uri.parse("content://mms-sms/conversations/"+prefs.getString("sms_threadId", null)));  
+//		    		PendingIntent pendingRespondIntent = PendingIntent.getActivity(context, 0, callIntent, 0);
+
+		    	    Notification paramNotif = (Notification)param.args[2];
+		    		
+		    		CharSequence[] notificationsText = getNotificationText2(paramNotif.contentView, context);
+		    		Notification newNotif = new Notification.Builder(mContext)
+		    		.setWhen(paramNotif.when)
+		            .setTicker(paramNotif.tickerText)
+		            .setLargeIcon(paramNotif.largeIcon)
+		            .setSmallIcon(paramNotif.icon)
+		            .setContentTitle(notificationsText[0])
+		            .setContentIntent(paramNotif.contentIntent)
+		            .setPriority(paramNotif.priority)
+		            .setSound(paramNotif.sound)
+		            .setDefaults(paramNotif.defaults)
+		            .setDeleteIntent(paramNotif.deleteIntent)
+		            .setContentText(notificationsText[2])
+		            .addAction(R.drawable.ic_launcher, "Call", pendingCallIntent)
+		            .addAction(R.drawable.ic_launcher, "Respond", pendingRespondIntent)
+		            .addAction(R.drawable.ic_launcher, "Mark as read", pendingIntentMarkAsRead).build();
+		    		
+		    		param.args[2] = newNotif;
+
+		    	}
+     		}
+    		@Override
+    		protected void afterHookedMethod(MethodHookParam param) throws Throwable 
+    		{
+    		}
+    	});
     }
     
     private final TextWatcher mNewTextEditorWatcher = new TextWatcher() {

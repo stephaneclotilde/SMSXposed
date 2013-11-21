@@ -23,6 +23,7 @@
     <string name="sms_custom_icon_color_toggle_summary"></string>
     <string name="changes_apply_on_reboot">This change will apply after a reboot.</string>
     <string name="crash_toast_text">bug report</string>
+    <string name="to_recipe">To: </string>
     
     <!-- Color Picker -->
     <string name="dialog_color_picker">Color Picker</string>

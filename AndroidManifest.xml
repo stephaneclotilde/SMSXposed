@@ -8,6 +8,7 @@
     <uses-permission android:name="android.permission.EXPAND_STATUS_BAR"/>
     <uses-permission android:name="android.permission.WRITE_SMS"/>
     <uses-permission android:name="android.permission.READ_SMS"/>
+    <uses-permission android:name="android.permission.SEND_SMS"/>
     
     <uses-sdk
         android:minSdkVersion="14"
@@ -33,7 +34,7 @@
         </activity>
         <activity
          	android:name="com.stephapps.smsxposed.QuickResponseDialogActivity"
-         	android:theme="@android:style/Theme.Translucent.NoTitleBar" >   
+         	android:theme="@android:style/Theme.Holo.Dialog" >   
         </activity>
         <receiver android:name=".receiver.MarkAsReadReceiver"
             android:exported="true"
