@@ -565,8 +565,9 @@ public class SMSXposed implements IXposedHookZygoteInit, IXposedHookLoadPackage,
 	
 	private void wakeDevice(Context context)
 	{
+		Log.i("SMSXposed","wakeDevice");
 		PowerManager pm = (PowerManager)context.getSystemService(Context.POWER_SERVICE);
-		if (pm.isScreenOn())
+		if (!pm.isScreenOn())
 		{
 			mSMSWakeLock = pm.newWakeLock((PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.FULL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP | PowerManager.ON_AFTER_RELEASE), "TAG");
 			mSMSWakeLock.acquire();
