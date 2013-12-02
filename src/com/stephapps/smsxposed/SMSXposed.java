@@ -62,6 +62,7 @@ import de.robv.android.xposed.IXposedHookLoadPackage;
 import de.robv.android.xposed.IXposedHookZygoteInit;
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XSharedPreferences;
+import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_InitPackageResources.InitPackageResourcesParam;
 import de.robv.android.xposed.callbacks.XC_LoadPackage.LoadPackageParam;
@@ -94,13 +95,35 @@ public class SMSXposed implements IXposedHookZygoteInit, IXposedHookLoadPackage,
         
         XSharedPreferences prefs = new XSharedPreferences(PACKAGE_NAME);
     	final boolean wakeOnNewSMS = prefs.getBoolean("wake_on_new_sms", false);
-        final Class<?> contextClass = XposedHelpers.findClass("com.android.internal.telephony.SMSDispatcher", null);
+//        final Class<?> contextClass = XposedHelpers.findClass("com.android.internal.telephony.SMSDispatcher", null);
 
-        findAndHookMethod(contextClass, "dispatch",  Intent.class, String.class, new XC_MethodHook() {
-			@Override
-    		protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-				Context context = (Context) XposedHelpers.getObjectField(param.thisObject, "mContext");
-				Log.i("SMSXposed","dispatchPdus hooked "+context.getPackageName());
+//        findAndHookMethod(contextClass, "dispatch",  Intent.class, String.class, new XC_MethodHook() {
+//			@Override
+//    		protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+//				Context context = (Context) XposedHelpers.getObjectField(param.thisObject, "mContext");
+//				Log.i("SMSXposed","dispatchPdus hooked "+context.getPackageName());
+//				
+//				interceptAndSaveSMSInformations( context,(Intent)param.args[0]);
+//				
+//				if (wakeOnNewSMS)
+//				{
+//					wakeDevice(context);
+//				}
+//			}
+//			
+//			@Override
+//    		protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+//				Log.i("SMSXposed","dispatchPdus hooked");
+//			}
+//        });
+        
+        final Class<?> contextClass = XposedHelpers.findClass("android.content.ContextWrapper", null);
+        XposedBridge.hookAllMethods(contextClass, "sendOrderedBroadcast", new XC_MethodHook() {
+        	protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+        		Log.i("SMSXposed","sendOrderedBroadcast hooked "+(String)param.args[1]);
+				
+				Context context = (Context)param.thisObject;
+				Log.i("SMSXposed","sendOrderedBroadcast hooked "+context.getPackageName());
 				
 				interceptAndSaveSMSInformations( context,(Intent)param.args[0]);
 				
@@ -109,31 +132,7 @@ public class SMSXposed implements IXposedHookZygoteInit, IXposedHookLoadPackage,
 					wakeDevice(context);
 				}
 			}
-			
-			@Override
-    		protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-				Log.i("SMSXposed","dispatchPdus hooked");
-			}
-        });
-        
-//        final Class<?> contextClass = XposedHelpers.findClass("android.content.Context", null);
-//
-//        findAndHookMethod(contextClass, "sendOrderedBroadcast", Intent.class, String.class, BroadcastReceiver.class,
-//        								Handler.class, int.class, String.class,Bundle.class, new XC_MethodHook() {
-//			@Override
-//    		protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-//				Log.i("SMSXposed","sendOrderedBroadcast hooked "+((Context)param.thisObject).getPackageName());
-//				
-//			}
-//			
-//			@Override
-//    		protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-//				Log.i("SMSXposed","sendOrderedBroadcast hooked");
-//			}
-//        });
-        
-        
-		
+        });		
 	}
 
 	 @Override
@@ -551,7 +550,7 @@ public class SMSXposed implements IXposedHookZygoteInit, IXposedHookLoadPackage,
 	{
 		SmsMessage[] msgs = SMSTools.getMessagesFromIntent(intent);
         SmsMessage sms = msgs[0];
-        Log.v("SMSXposed", "handleSmsReceived" + (sms.isReplace() ? "(replace)" : "") +
+        Log.i("SMSXposed", "handleSmsReceived" + (sms.isReplace() ? "(replace)" : "") +
                 ", address: " + sms.getOriginatingAddress() +
                 ", body: " + sms.getMessageBody()
                 + ""+context.getPackageName());
