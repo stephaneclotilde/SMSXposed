@@ -52,10 +52,12 @@ public class MainActivity extends Activity {
 		    String[] destinations = res.getStringArray(R.array.symbols_array);
 		    String[] delayed_sources = res.getStringArray(R.array.delayed_punctuation_array);
 		    String[] delayed_destinations = res.getStringArray(R.array.delayed_symbols_array);
+		    String[] notifications_actions = res.getStringArray(R.array.action_buttons_array);
 		    saveArray(edit,Constants.SOURCES, sources);
 		    saveArray(edit,Constants.DESTINATIONS, destinations);
 		    saveArray(edit,Constants.DELAYED_SOURCES, delayed_sources);
 		    saveArray(edit,Constants.DELAYED_DESTINATIONS, delayed_destinations);
+		    saveArray(edit,Constants.NOTIFICATION_ACTIONS, notifications_actions);
 		    edit.commit();
 		    
 //		    boolean isChecked = settings.getBoolean("privacy_mode", false);

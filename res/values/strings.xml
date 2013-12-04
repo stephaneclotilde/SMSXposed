@@ -19,15 +19,26 @@
     <string name="wake_on_new_SMS_summary">Turns the screen on when receiving a new sms</string>
     <string name="sms_icon_color_title">Choose SMS icon color</string>
     <string name="sms_icon_color_summary">Choose the color of the sms icon in the status bar</string>
+    <string name="add_buttons_title">Notification buttons</string>
+    <string name="add_buttons_summary">Adds the \'Respond\', \'Call\' and \'Mark as read\' buttons in SMS notifications</string>
     <string name="sms_custom_icon_color_toggle_title">Activate custom icon color</string>
     <string name="sms_custom_icon_color_toggle_summary"></string>
     <string name="changes_apply_on_reboot">This change will apply after a reboot.</string>
     <string name="crash_toast_text">bug report</string>
     <string name="to_recipe">To: </string>
-    
+    <string name="all_sms_apps">All SMS Apps tweaks</string>
+    <string name="stock_or_hangouts">AOSP SMS or Hangouts</string>
+    <string name="stock_only">AOSP SMS app only</string>
+     
     <!-- Color Picker -->
     <string name="dialog_color_picker">Color Picker</string>
-    <string name="press_color_to_apply">Press on Color to apply</string>    
+    <string name="press_color_to_apply">Press on Color to apply</string>   
+    
+    <string-array name="action_buttons_array">
+        <item>Call</item>
+        <item>Respond</item>
+        <item>Mark as read</item>
+    </string-array>
      
     <string-array name="punctuation_array">
         <item>semicolon</item>

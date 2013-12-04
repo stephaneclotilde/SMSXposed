@@ -19,12 +19,25 @@
     <string name="wake_on_new_SMS_summary">Allume l\'écran lors de la récéption d\'un nouveau SMS</string>
     <string name="sms_icon_color_title">Choisir la couleur de l\'icone SMS</string>
     <string name="sms_icon_color_summary">Choisir la couleur de l\'icone SMS dans la barre de statut</string>
+    <string name="add_buttons_title">Boutons de notifications</string>
+    <string name="add_buttons_summary">Ajout des boutons \'Réponse\', \'Appeler\' et \'Marquer comme lu\' dans les ntoifications SMS </string>
+    <string name="sms_custom_icon_color_toggle_title">Activer la couleur d\'icone personnalisée</string>
     <string name="changes_apply_on_reboot">Ce changement sera appliqué après un redémarrage.</string>
-    <string name="to_recipe">A: </string> 
+    <string name="to_recipe">A: </string>
+    <string name="all_sms_apps">options pour toutes les applis SMS</string>
+    <string name="stock_or_hangouts">SMS AOSP ou Hangouts</string>
+    <string name="stock_only">Seulement l\'appli SMS AOSP</string>
+     
     
     <!-- Color Picker -->
     <string name="dialog_color_picker">Sélecteur de couleur</string>
     <string name="press_color_to_apply">Appuyez sur couleur pour appliquer</string>    
+    
+    <string-array name="action_buttons_array">
+        <item>Appeler</item>
+        <item>Répondre</item>
+        <item>Marquer lu</item>
+    </string-array>
     
     <string-array name="punctuation_array">
         <item>point virgule</item>
