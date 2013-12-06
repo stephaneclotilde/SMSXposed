@@ -118,14 +118,22 @@ public class SMSXposed implements IXposedHookZygoteInit, IXposedHookLoadPackage,
 		    	}
      		}
     	});
-
-    	if (mNotificationHAsBeenAlreadyIntercepted==false)
-    	{
-    		final Class<?> contextClass = XposedHelpers.findClass("android.content.ContextWrapper", null);
-            XposedBridge.hookAllMethods(contextClass, "sendOrderedBroadcast", new XC_MethodHook() 
-            {
-            	protected void beforeHookedMethod(MethodHookParam param) throws Throwable 
+   	
+		final Class<?> contextClass = XposedHelpers.findClass("android.content.ContextWrapper", null);
+        XposedBridge.hookAllMethods(contextClass, "sendOrderedBroadcast", new XC_MethodHook() 
+        {
+        	protected void beforeHookedMethod(MethodHookParam param) throws Throwable 
+        	{
+        		if (mNotificationHAsBeenAlreadyIntercepted==false)
             	{
+            		mNotificationHAsBeenAlreadyIntercepted=true;
+             		Handler handler = new Handler();
+             		handler.postDelayed(new Runnable() {
+         				@Override
+         				public void run() {
+         					mNotificationHAsBeenAlreadyIntercepted=false;
+         				}
+         			}, 250);
             		if (((String)param.args[1]).equals("android.permission.RECEIVE_SMS"))
             		{
     	        		Context context = (Context)param.thisObject;
@@ -136,18 +144,9 @@ public class SMSXposed implements IXposedHookZygoteInit, IXposedHookLoadPackage,
     					
     					if (wakeOnNewSMS)	wakeDevice(context);
             		}
-    			}
-            });
-            
-//            mNotificationHAsBeenAlreadyIntercepted=true;
-//    		Handler handler = new Handler();
-//    		handler.postDelayed(new Runnable() {
-//				@Override
-//				public void run() {
-//					mNotificationHAsBeenAlreadyIntercepted=false;
-//				}
-//			}, 250);
-    	}	
+            	}
+			}
+        });  	
 	}
 
 	 @Override

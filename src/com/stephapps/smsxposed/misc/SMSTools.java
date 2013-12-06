@@ -4,12 +4,14 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 
 import android.app.PendingIntent;
+import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.ContactsContract.PhoneLookup;
 import android.telephony.SmsManager;
 import android.telephony.SmsMessage;
 import android.util.Log;
@@ -32,11 +34,8 @@ public class SMSTools {
 	public static final String SMS_THREAD_ID = "thread_id";
 	private static final String[] SMS_THREAD_ID_PROJECTION = new String[] { SMS_THREAD_ID };
 	   
-    
-
 	public static void markMessageRead(Context context, String number, String body) 
 	{
-	
         Uri uri = Uri.parse("content://sms/inbox");
         Cursor cursor = context.getContentResolver().query(uri, null, null, null, null);
         try{
@@ -78,7 +77,8 @@ public class SMSTools {
         context.getContentResolver().insert(Uri.parse("content://sms/sent"), values);
     }
     
-    public static SmsMessage[] getMessagesFromIntent( Intent intent) {
+    public static SmsMessage[] getMessagesFromIntent( Intent intent) 
+    {
         Object[] messages = (Object[]) intent.getSerializableExtra("pdus");
         String format = intent.getStringExtra("format");
         byte[][] pduObjs = new byte[messages.length][];
@@ -165,6 +165,26 @@ public class SMSTools {
         
         return false;
 
+    }
+    
+    public static String getContactName(Context context, String phoneNumber) 
+    {
+        ContentResolver cr = context.getContentResolver();
+        Uri uri = Uri.withAppendedPath(PhoneLookup.CONTENT_FILTER_URI, Uri.encode(phoneNumber));
+        Cursor cursor = cr.query(uri, new String[]{PhoneLookup.DISPLAY_NAME}, null, null, null);
+        if (cursor == null) {
+            return null;
+        }
+        String contactName = null;
+        if(cursor.moveToFirst()) {
+            contactName = cursor.getString(cursor.getColumnIndex(PhoneLookup.DISPLAY_NAME));
+        }
+
+        if(cursor != null && !cursor.isClosed()) {
+            cursor.close();
+        }
+
+        return contactName;
     }
 
 }

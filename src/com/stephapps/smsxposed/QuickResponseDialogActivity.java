@@ -29,11 +29,13 @@ public class QuickResponseDialogActivity extends Activity {
 
 	private void displayAlert()
 	{
+		String contactName = SMSTools.getContactName(this, mSMSSender);
+		if (contactName==null) contactName = mSMSSender;
 		// Set an EditText view to get user input 
 		final EditText input = new EditText(this);
 		new AlertDialog.Builder(this)
 	    .setTitle("Respond to SMS")
-	    .setMessage(getString(R.string.to_recipe)+mSMSSender)
+	    .setMessage(getString(R.string.to_recipe)+contactName)
 	    .setView(input)
 	    .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
 	        public void onClick(DialogInterface dialog, int whichButton) {
@@ -50,8 +52,7 @@ public class QuickResponseDialogActivity extends Activity {
 	        	dialog.cancel();
                 finish();
 	        }
-	    }).show();
-		
+	    }).show();	
 	}
 
 }
