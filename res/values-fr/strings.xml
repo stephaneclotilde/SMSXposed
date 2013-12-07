@@ -37,6 +37,7 @@
         <item>Appeler</item>
         <item>Répondre</item>
         <item>Marquer lu</item>
+        <item>Show</item>
     </string-array>
     
     <string-array name="punctuation_array">

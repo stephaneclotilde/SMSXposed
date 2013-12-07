@@ -6,6 +6,7 @@ import java.lang.reflect.Method;
 import com.stephapps.smsxposed.misc.PhoneTools;
 import com.stephapps.smsxposed.misc.SMSTools;
 
+import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -27,5 +28,7 @@ public class MarkAsReadReceiver extends BroadcastReceiver{
        SMSTools.markMessageRead(context, extras.getString("sms_sender"), extras.getString("sms_msg"));
        Toast.makeText(context, "mark as read", Toast.LENGTH_SHORT).show();
        
+       NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+       notificationManager.cancel(extras.getInt("notification_id"));
 	 } 
 }

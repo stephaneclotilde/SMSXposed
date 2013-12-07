@@ -108,12 +108,11 @@ public class SMSXposed implements IXposedHookZygoteInit, IXposedHookLoadPackage,
     			
 				if (context.getPackageName().equals("com.android.mms")||context.getPackageName().equals("com.google.android.talk"))
 		    	{
-		    		if (addButtons) 
-		    			param.args[2] = addButtonsToSmsNotifications(context, param.args[2], notificationActions);
+		    		if (privacyMode) 
+		    			param.args[2] = setPrivacyOnNotification(context, param.args[2], notificationActions[3], showSender, (Integer)param.args[1]);
 		    		else
 		    		{		    		
-			    		if (privacyMode)
-			    			setPrivacyOnNotification(context, param.args[2], showSender);
+		    			if (addButtons) param.args[2] = addButtonsToSmsNotifications(context, param.args[2], notificationActions, (Integer)param.args[1]);	
 		    		}
 		    	}
      		}
@@ -254,16 +253,15 @@ public class SMSXposed implements IXposedHookZygoteInit, IXposedHookLoadPackage,
     	}
     }
     
- 	private Object addButtonsToSmsNotifications(Context context, Object notification, String[] notificationsActions)
+ 	private Object addButtonsToSmsNotifications(Context context, Object notification, String[] notificationsActions, Integer notificationId)
     {
  		XSharedPreferences prefs = new XSharedPreferences("com.android.phone","smsXposedPreferences");
 		final String smsMsg = prefs.getString("sms_msg", null);
     	final String smsSender = prefs.getString("sms_sender", null);
     	Log.i("SMSXposed","sms sender"+smsSender);
-    	final String uri = "tel:" + smsSender ;
-		
+    	
  		Intent callIntent = new Intent(Intent.ACTION_CALL);
-		callIntent.setData(Uri.parse(uri));
+		callIntent.setData(Uri.parse("tel:" + smsSender));
 		PendingIntent pendingCallIntent = PendingIntent.getActivity(context, 0, callIntent, 0);
 		
 		Intent respondIntent = new Intent(); 
@@ -275,6 +273,7 @@ public class SMSXposed implements IXposedHookZygoteInit, IXposedHookLoadPackage,
 		Intent markAsReadIntent = new Intent();
 		markAsReadIntent.putExtra("sms_sender", smsSender);
 		markAsReadIntent.putExtra("sms_msg", smsMsg);
+		markAsReadIntent.putExtra("notification_id", notificationId);
 		markAsReadIntent.setAction("com.stephapps.smsxposed.markasread_receiver");
 	    PendingIntent pendingIntentMarkAsRead = PendingIntent.getBroadcast(context, 0, markAsReadIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
@@ -301,18 +300,33 @@ public class SMSXposed implements IXposedHookZygoteInit, IXposedHookLoadPackage,
 		return newNotif;
     }
  	
- 	private void setPrivacyOnNotification(Context context, Object notification, boolean showSender)
+ 	private Notification setPrivacyOnNotification(Context context, Object notification, String showAction, boolean showSender, Integer notificationId)
  	{
+ 		XSharedPreferences prefs = new XSharedPreferences("com.android.phone","smsXposedPreferences");
+		final String smsMsg = prefs.getString("sms_msg", null);
+    	final String smsSender = prefs.getString("sms_sender", null);
+    	
  		Notification paramNotif = (Notification)notification;
  		CharSequence[] notificationsText = getNotificationText2(paramNotif.contentView, context);
-		
- 		CharSequence sender;
+ 		
+ 		Intent showIntent = new Intent(); 
+ 		showIntent.putExtra("sms_sender", smsSender);
+ 		showIntent.putExtra("sms_msg", smsMsg);
+ 		showIntent.putExtra("ticker", paramNotif.tickerText);
+ 		showIntent.putExtra("content_title", notificationsText[0]);
+ 		showIntent.putExtra("content_text", notificationsText[2]);
+ 		showIntent.putExtra("notification_id", notificationId);
+ 		showIntent.putExtra("notification", paramNotif);
+ 		showIntent.setAction("com.stephapps.smsxposed.shownotification_receiver");
+		PendingIntent pendingShowIntent = PendingIntent.getBroadcast(context, 0, showIntent, PendingIntent.FLAG_UPDATE_CURRENT);		    	     
+
+		CharSequence sender;
  		if (!showSender) 	sender = notificationsText[0];
  		else 				sender = "    ";
 
 		Notification newNotif = new Notification.Builder(context)
 		.setWhen(paramNotif.when)
-        .setTicker(paramNotif.tickerText)
+        .setTicker("    ")
         .setLargeIcon(paramNotif.largeIcon)
         .setSmallIcon(paramNotif.icon)
         .setContentTitle(sender)
@@ -322,9 +336,10 @@ public class SMSXposed implements IXposedHookZygoteInit, IXposedHookLoadPackage,
         .setDefaults(paramNotif.defaults)
         .setDeleteIntent(paramNotif.deleteIntent)
         .setContentText("    ")
+        .addAction(android.R.drawable.ic_menu_call, showAction, pendingShowIntent)
         .build();
 		
-		notification = newNotif;
+		return newNotif;
  	}
     
     private final TextWatcher mNewTextEditorWatcher = new TextWatcher() {
