@@ -13,6 +13,8 @@
     <string name="privacy_mode_summary">Hides the sender and text message when receiving a SMS notification</string>
     <string name="privacy_show_sender_title">Privacy - show Sender</string>
     <string name="privacy_show_sender_summary">Shows the sender in privacy mode</string>
+    <string name="privacy_add_show_btn_title">Privacy - add Show Button</string>
+    <string name="privacy_add_show_btn_summary">The Show button will reveal SMS sender and text and action buttons</string>
     <string name="unlimited_textbox_title">Unlimited Textbox</string>
     <string name="unlimited_textbox_summary">Removes the 3-lines height limit for the SMS typing box</string>
     <string name="wake_on_new_SMS_title">Wake on new SMS</string>
@@ -23,7 +25,7 @@
     <string name="add_buttons_summary">Adds the \'Respond\', \'Call\' and \'Mark as read\' buttons in SMS notifications</string>
     <string name="sms_custom_icon_color_toggle_title">Activate custom icon color</string>
     <string name="sms_custom_icon_color_toggle_summary"></string>
-    <string name="changes_apply_on_reboot">This change will apply after a reboot.</string>
+    <string name="changes_apply_on_reboot">Don\'t forget to reboot for changes to take effect</string>
     <string name="crash_toast_text">bug report</string>
     <string name="to_recipe">To: </string>
     <string name="all_sms_apps">All SMS Apps tweaks</string>

@@ -14,11 +14,13 @@ import java.util.SortedSet;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.res.Resources;
@@ -34,8 +36,10 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.os.Messenger;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
+import android.os.RemoteException;
 import android.os.UserHandle;
 import android.preference.Preference;
 import android.preference.PreferenceManager;
@@ -79,10 +83,11 @@ public class SMSXposed implements IXposedHookZygoteInit, IXposedHookLoadPackage,
 	private Drawable mSMSSmallIcon;
 	private static final String PACKAGE_NAME = SMSXposed.class.getPackage().getName();
 	private WakeLock mSMSWakeLock;
-	private boolean mNotificationHAsBeenAlreadyIntercepted=false;
-	
+	private boolean mNotificationHAsBeenAlreadyIntercepted=false, mIsReceiverAlreadyRegistered=false;
+	private static boolean mDontInterceptNotification=false;
 	private static String MODULE_PATH = null;
 	private int mSmsIconColor;
+		
 	
 	@Override
 	public void initZygote(StartupParam startupParam) throws Throwable 
@@ -96,6 +101,7 @@ public class SMSXposed implements IXposedHookZygoteInit, IXposedHookLoadPackage,
     	final boolean wakeOnNewSMS = prefs.getBoolean("wake_on_new_sms", false);
     	final boolean privacyMode = prefs.getBoolean("privacy_mode", false);
     	final boolean showSender = prefs.getBoolean("privacy_show_sender", false);
+    	final boolean addShowBtn = prefs.getBoolean("privacy_add_show_btn", false);
     	final String[] notificationActions = loadArray(Constants.NOTIFICATION_ACTIONS, prefs);
 
     	final Class<?> notificationManagerClass = XposedHelpers.findClass("android.app.NotificationManager", null);
@@ -104,12 +110,34 @@ public class SMSXposed implements IXposedHookZygoteInit, IXposedHookLoadPackage,
 			@Override
     		protected void beforeHookedMethod(MethodHookParam param) throws Throwable 
     		{	
+				Log.i("SMSXPosed","log test");
+				if (mDontInterceptNotification){
+					mDontInterceptNotification=false;
+					return;
+				}
+				
 				Context context = (Context) XposedHelpers.getObjectField(param.thisObject, "mContext");
     			
 				if (context.getPackageName().equals("com.android.mms")||context.getPackageName().equals("com.google.android.talk"))
 		    	{
-		    		if (privacyMode) 
-		    			param.args[2] = setPrivacyOnNotification(context, param.args[2], notificationActions[3], showSender, (Integer)param.args[1]);
+//					//TODO:not sure if it can be done with a single boolean since this will be called in different packages
+//					//so we'll use the safer approach of unregistering for the moment
+//					if (mIsReceiverAlreadyRegistered==false)
+//					{
+//						try {
+//							context.unregisterReceiver(mBroadcastReceiver);
+//						} catch (Exception e) {
+//							Log.i("SMSXposed","Exception: mBroadcastReceiver probably was not registered yet");
+//						}
+//						Log.i("SMSXposed","registering sendNotificationReceiver");
+//						IntentFilter intentFilter = new IntentFilter();
+//						intentFilter.addAction(Constants.SEND_NOTIFICATION_RECEIVER);
+//						context.registerReceiver(mBroadcastReceiver, intentFilter);
+//						mIsReceiverAlreadyRegistered=true;
+//					}
+		    		
+					if (privacyMode) 
+		    			param.args[2] = setPrivacyOnNotification(context, param.args[2], notificationActions[3], addShowBtn, addButtons, showSender, (Integer)param.args[1]);
 		    		else
 		    		{		    		
 		    			if (addButtons) param.args[2] = addButtonsToSmsNotifications(context, param.args[2], notificationActions, (Integer)param.args[1]);	
@@ -279,7 +307,7 @@ public class SMSXposed implements IXposedHookZygoteInit, IXposedHookLoadPackage,
 
 	    Notification paramNotif = (Notification)notification;
 		
-		CharSequence[] notificationsText = getNotificationText2(paramNotif.contentView, context);
+		CharSequence[] notificationsText = SMSTools.getTextFromNotificationView(paramNotif.contentView, context);
 		Notification newNotif = new Notification.Builder(context)
 		.setWhen(paramNotif.when)
         .setTicker(paramNotif.tickerText)
@@ -300,44 +328,68 @@ public class SMSXposed implements IXposedHookZygoteInit, IXposedHookLoadPackage,
 		return newNotif;
     }
  	
- 	private Notification setPrivacyOnNotification(Context context, Object notification, String showAction, boolean showSender, Integer notificationId)
+ 	private Notification setPrivacyOnNotification(Context context, Object notification, String showActionString, boolean addShowBtn, boolean showNotificationAction, boolean showSender, Integer notificationId)
  	{
  		XSharedPreferences prefs = new XSharedPreferences("com.android.phone","smsXposedPreferences");
 		final String smsMsg = prefs.getString("sms_msg", null);
     	final String smsSender = prefs.getString("sms_sender", null);
     	
  		Notification paramNotif = (Notification)notification;
- 		CharSequence[] notificationsText = getNotificationText2(paramNotif.contentView, context);
+ 		CharSequence[] notificationsText = SMSTools.getTextFromNotificationView(paramNotif.contentView, context);
  		
- 		Intent showIntent = new Intent(); 
- 		showIntent.putExtra("sms_sender", smsSender);
- 		showIntent.putExtra("sms_msg", smsMsg);
- 		showIntent.putExtra("ticker", paramNotif.tickerText);
- 		showIntent.putExtra("content_title", notificationsText[0]);
- 		showIntent.putExtra("content_text", notificationsText[2]);
- 		showIntent.putExtra("notification_id", notificationId);
- 		showIntent.putExtra("notification", paramNotif);
- 		showIntent.setAction("com.stephapps.smsxposed.shownotification_receiver");
-		PendingIntent pendingShowIntent = PendingIntent.getBroadcast(context, 0, showIntent, PendingIntent.FLAG_UPDATE_CURRENT);		    	     
-
-		CharSequence sender;
+ 		CharSequence sender;
  		if (!showSender) 	sender = notificationsText[0];
  		else 				sender = "    ";
 
-		Notification newNotif = new Notification.Builder(context)
-		.setWhen(paramNotif.when)
-        .setTicker("    ")
-        .setLargeIcon(paramNotif.largeIcon)
-        .setSmallIcon(paramNotif.icon)
-        .setContentTitle(sender)
-        .setContentIntent(paramNotif.contentIntent)
-        .setPriority(paramNotif.priority)
-        .setSound(paramNotif.sound)
-        .setDefaults(paramNotif.defaults)
-        .setDeleteIntent(paramNotif.deleteIntent)
-        .setContentText("    ")
-        .addAction(android.R.drawable.ic_menu_call, showAction, pendingShowIntent)
-        .build();
+ 		Notification newNotif;
+ 		
+ 		if (addShowBtn)
+ 		{
+	 		Intent showIntent = new Intent(); 
+	 		showIntent.putExtra("show_notification_action", showNotificationAction);
+	 		showIntent.putExtra("sms_sender", smsSender);
+	 		showIntent.putExtra("sms_msg", smsMsg);
+	 		showIntent.putExtra("ticker", paramNotif.tickerText);
+	 		showIntent.putExtra("content_title", notificationsText[0]);
+	 		showIntent.putExtra("content_text", notificationsText[2]);
+	 		showIntent.putExtra("notification_id", notificationId);
+	 		showIntent.putExtra("notification", paramNotif);
+	 		showIntent.setAction("com.stephapps.smsxposed.shownotification_receiver");
+			PendingIntent pendingShowIntent = PendingIntent.getBroadcast(context, 0, showIntent, PendingIntent.FLAG_UPDATE_CURRENT);		    	     
+	
+			newNotif = new Notification.Builder(context)
+			.setWhen(paramNotif.when)
+	        .setTicker("    ")
+	        .setLargeIcon(paramNotif.largeIcon)
+	        .setSmallIcon(paramNotif.icon)
+	        .setContentTitle(sender)
+	        .setContentIntent(paramNotif.contentIntent)
+	        .setPriority(paramNotif.priority)
+	        .setSound(paramNotif.sound)
+	        .setDefaults(paramNotif.defaults)
+	        .setDeleteIntent(paramNotif.deleteIntent)
+	        .setContentText("    ")
+	        .addAction(android.R.drawable.ic_menu_view, showActionString, pendingShowIntent)
+	        .build();
+ 		}
+ 		else
+ 		{
+ 			//TODO: in theory we could just modify the original notification since there's no additionnal action button (addable only via Builder)
+ 			//but this would require to mess with ContentView for ContentText, will leave that for later
+ 			newNotif = new Notification.Builder(context)
+			.setWhen(paramNotif.when)
+	        .setTicker("    ")
+	        .setLargeIcon(paramNotif.largeIcon)
+	        .setSmallIcon(paramNotif.icon)
+	        .setContentTitle(sender)
+	        .setContentIntent(paramNotif.contentIntent)
+	        .setPriority(paramNotif.priority)
+	        .setSound(paramNotif.sound)
+	        .setDefaults(paramNotif.defaults)
+	        .setDeleteIntent(paramNotif.deleteIntent)
+	        .setContentText("    ")
+	        .build();
+ 		}
 		
 		return newNotif;
  	}
@@ -499,7 +551,7 @@ public class SMSXposed implements IXposedHookZygoteInit, IXposedHookLoadPackage,
 //        }
 //    }
     
-    private String[] loadArray(String arrayName, XSharedPreferences prefs)
+    private static String[] loadArray(String arrayName, XSharedPreferences prefs)
     {
     	int size = prefs.getInt(arrayName + "_size", 0);  
         String array[] = new String[size];  
@@ -508,25 +560,7 @@ public class SMSXposed implements IXposedHookZygoteInit, IXposedHookLoadPackage,
         return array; 
     }
 
-    private CharSequence[] getNotificationText2(RemoteViews contentView, Context context)
-    {
-    	CharSequence[] notificationsText = new String[3];
-    	
-    	try {
-			/* Re-create a 'local' view group from the info contained in the remote view */
-			LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-			ViewGroup localView = (ViewGroup) inflater.inflate(contentView.getLayoutId(), null);
-			contentView.reapply(context, localView);
-			
-			notificationsText[0] = ((TextView)localView.findViewById(16908310)).getText();
-//    	notificationsText[1] = ((TextView)localView.findViewById(16909082)).getText();
-			notificationsText[2] = ((TextView)localView.findViewById(16908358)).getText().toString();
-		} catch (Exception e) {
-			e.printStackTrace();
-			return null;
-		}
-		return notificationsText;
-    }
+   
     
     private void interceptAndSaveSMSInformations(Context context,Intent intent)
 	{
@@ -555,5 +589,19 @@ public class SMSXposed implements IXposedHookZygoteInit, IXposedHookLoadPackage,
 			mSMSWakeLock.release();
 		}
 	}
+	
+	private static BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
+
+		@Override
+        public void onReceive(Context context, Intent intent) 
+		{
+			Log.i("Broadcast Receiver","log test");
+			Bundle extras = intent.getExtras();
+			mDontInterceptNotification=true;
+			NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+			notificationManager.notify(extras.getInt("notification_id"), (Notification)extras.getParcelable("notification"));
+			//addButtonsToSmsNotifications(context, intent.getParcelableExtra("notification") ,notificationActions ,2 );
+        }
+    };
     
 }

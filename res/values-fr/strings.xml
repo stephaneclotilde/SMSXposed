@@ -13,6 +13,8 @@
     <string name="privacy_mode_summary">Cache l\'auteur et le texte lors de la récéption d\'une notification SMS</string>
     <string name="privacy_show_sender_title">Mode privé - afficher l\'auteur</string>
     <string name="privacy_show_sender_summary">Affiche l\'auteur en mode privé</string>
+    <string name="privacy_add_show_btn_title">Mode privé - ajouter bouton Voir</string>
+    <string name="privacy_add_show_btn_summary">le bouton Voir révèle l\'auteur du SMS, son contenu et les boutons d\'action</string>
     <string name="unlimited_textbox_title">Hauteur de texte illimitée</string>
     <string name="unlimited_textbox_summary">Enlève la limite de 3 lignes de hauteur pour le cadre d\'édition de SMS </string>
     <string name="wake_on_new_SMS_title">Allumage lors d\'un nouveau SMS</string>
@@ -22,7 +24,7 @@
     <string name="add_buttons_title">Boutons de notifications</string>
     <string name="add_buttons_summary">Ajout des boutons \'Réponse\', \'Appeler\' et \'Marquer comme lu\' dans les ntoifications SMS </string>
     <string name="sms_custom_icon_color_toggle_title">Activer la couleur d\'icone personnalisée</string>
-    <string name="changes_apply_on_reboot">Ce changement sera appliqué après un redémarrage.</string>
+    <string name="changes_apply_on_reboot">N\'oubliez pas de redémarrer pour que les changements prennent effet.</string>
     <string name="to_recipe">A: </string>
     <string name="all_sms_apps">options pour toutes les applis SMS</string>
     <string name="stock_or_hangouts">SMS AOSP ou Hangouts</string>
@@ -37,7 +39,7 @@
         <item>Appeler</item>
         <item>Répondre</item>
         <item>Marquer lu</item>
-        <item>Show</item>
+        <item>Voir</item>
     </string-array>
     
     <string-array name="punctuation_array">

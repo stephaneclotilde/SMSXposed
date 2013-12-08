@@ -37,6 +37,10 @@
          	android:name="com.stephapps.smsxposed.QuickResponseDialogActivity"
          	android:theme="@android:style/Theme.Holo.Dialog" >   
         </activity>
+         <activity
+         	android:name="com.stephapps.smsxposed.SendBroadcastActivity"
+         	android:theme="@android:style/Theme.Holo.Dialog" >   
+        </activity>
         <receiver android:name=".receiver.MarkAsReadReceiver"
             android:exported="true"
             android:enabled="true">

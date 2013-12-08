@@ -22,11 +22,11 @@ import android.util.Log;
 import android.view.Menu;
 import android.widget.Toast;
 
-public class MainActivity extends Activity {
-
-	
+public class MainActivity extends Activity 
+{	
 	@Override
-	protected void onCreate(Bundle savedInstanceState) {
+	protected void onCreate(Bundle savedInstanceState) 
+	{
 		super.onCreate(savedInstanceState);
 		// Display the fragment as the main content.
 	    if (savedInstanceState == null)
@@ -34,7 +34,10 @@ public class MainActivity extends Activity {
 	    new PrefsFragment()).commit();
 	}
 	
-	public static class PrefsFragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener {
+	public static class PrefsFragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener 
+	{	
+		private boolean mToastRebootOnChangeHasBeenShow = false;
+		
 		@Override
 		public void onCreate(Bundle savedInstanceState) 
 		{
@@ -59,18 +62,19 @@ public class MainActivity extends Activity {
 		    saveArray(edit,Constants.DELAYED_DESTINATIONS, delayed_destinations);
 		    saveArray(edit,Constants.NOTIFICATION_ACTIONS, notifications_actions);
 		    edit.commit();
-		    
-//		    boolean isChecked = settings.getBoolean("privacy_mode", false);
-//			Preference preference = getPreferenceScreen().findPreference("privacy_show_sender");
-//			preference.setEnabled(isChecked);
-//			
 		}
 
 		@Override
-		public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-			if (key.equals("sms_custom_icon_color_toggle"))
+		public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) 
+		{
+			if (mToastRebootOnChangeHasBeenShow==false)
 			{
 				Toast.makeText(getActivity().getApplicationContext(),getString(R.string.changes_apply_on_reboot),Toast.LENGTH_SHORT).show();
+				mToastRebootOnChangeHasBeenShow=true;
+			}
+			
+			if (key.equals("sms_custom_icon_color_toggle"))
+			{
 				if (sharedPreferences.getFloat("density", -1)!=-1)
 				{
 					Editor edit = sharedPreferences.edit();

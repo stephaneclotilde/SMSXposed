@@ -6,7 +6,6 @@ package com.stephapps.smsxposed.misc;
  *
  * Created by stephane clotilde on 10 oct. 2013
  *
- * Copyright (c) 2013 MobiCrea. All rights reserved.
  */
 
 public final class Constants {
@@ -17,5 +16,7 @@ public final class Constants {
 	public static final String DELAYED_DESTINATIONS = "delayed_destinations";
 	public static final String NOTIFICATION_ACTIONS = "notification_actions";
 	
+	public static final String SEND_NOTIFICATION_RECEIVER = "SEND_NOTIFICATION_RECEIVER";
+    
 
 }

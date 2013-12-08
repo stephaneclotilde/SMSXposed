@@ -15,6 +15,10 @@ import android.provider.ContactsContract.PhoneLookup;
 import android.telephony.SmsManager;
 import android.telephony.SmsMessage;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.ViewGroup;
+import android.widget.RemoteViews;
+import android.widget.TextView;
 
 import com.stephapps.smsxposed.R;
 
@@ -185,6 +189,26 @@ public class SMSTools {
         }
 
         return contactName;
+    }
+    
+    public static CharSequence[] getTextFromNotificationView(RemoteViews contentView, Context context)
+    {
+    	CharSequence[] notificationsText = new String[3];
+    	
+    	try {
+			/* Re-create a 'local' view group from the info contained in the remote view */
+			LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+			ViewGroup localView = (ViewGroup) inflater.inflate(contentView.getLayoutId(), null);
+			contentView.reapply(context, localView);
+			
+			notificationsText[0] = ((TextView)localView.findViewById(16908310)).getText();
+//    	notificationsText[1] = ((TextView)localView.findViewById(16909082)).getText();
+			notificationsText[2] = ((TextView)localView.findViewById(16908358)).getText().toString();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+		return notificationsText;
     }
 
 }

@@ -28,6 +28,13 @@
 	        android:summary="@string/privacy_show_sender_summary"
 	        android:title="@string/privacy_show_sender_title"
 	        android:dependency="privacy_mode" />
+	      
+	      <CheckBoxPreference
+	        android:defaultValue="false"
+	        android:key="privacy_add_show_btn"
+	        android:summary="@string/privacy_add_show_btn_summary"
+	        android:title="@string/privacy_add_show_btn_title"
+	        android:dependency="privacy_mode" />
      </PreferenceCategory>
 
      <PreferenceCategory android:title="@string/stock_only">
