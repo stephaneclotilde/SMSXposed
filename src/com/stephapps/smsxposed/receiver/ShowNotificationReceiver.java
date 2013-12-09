@@ -6,8 +6,11 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -58,7 +61,7 @@ public class ShowNotificationReceiver extends BroadcastReceiver
 			newNotif = new Notification.Builder(context)
 			.setWhen(paramNotif.when)
 	        .setTicker(extras.getCharSequence("ticker"))
-	        .setLargeIcon(paramNotif.largeIcon)
+	       // .setLargeIcon(paramNotif.largeIcon)
 	        //.setSmallIcon(R.drawable.ic_launcher) //no longer needed since it will be notified by the original app so the resources will be found
 	        .setSmallIcon(paramNotif.icon)
 	        .setContentTitle(extras.getCharSequence("content_title"))
@@ -78,8 +81,8 @@ public class ShowNotificationReceiver extends BroadcastReceiver
 			newNotif = new Notification.Builder(context)
 			.setWhen(paramNotif.when)
 	        .setTicker(extras.getCharSequence("ticker"))
-	        .setLargeIcon(paramNotif.largeIcon)
-	         //.setSmallIcon(R.drawable.ic_launcher) //no longer needed since it will be notified by the original app so the resources will be found
+	        //.setLargeIcon(paramNotif.largeIcon)
+	        //.setSmallIcon(R.drawable.ic_launcher) //no longer needed since it will be notified by the original app so the resources will be found
 	        .setSmallIcon(paramNotif.icon)
 	        .setContentTitle(extras.getCharSequence("content_title"))
 	        .setContentIntent(paramNotif.contentIntent)
@@ -91,11 +94,18 @@ public class ShowNotificationReceiver extends BroadcastReceiver
 	        .build();		
 		}
 		
+		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);			
+		Editor edit = settings.edit();
+		edit.putString("package_name_to_replace", extras.getString("package_name"));
+		edit.putBoolean("replace_package_name", true);
+		edit.commit();
 		//no longer needed, see below
 		NotificationManager notificationManager = (NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);
 		notificationManager.cancel(notificationId);//TODO:needed because for it to update the notification it needs to be done by the app itself(AOSP sms or Hangouts or other)    
-		notificationManager.notify(notificationId,newNotif);	
+//		notificationManager.notify(notificationId,newNotif);	
 		
+		edit.putBoolean("replace_package_name", false);
+		edit.commit();
 //		//we send back to the application because only the app itself can update an existing notification
 //		 Intent sendIntent = new Intent(context,SendBroadcastActivity.class);
 //        sendIntent.putExtra("notification", newNotif);

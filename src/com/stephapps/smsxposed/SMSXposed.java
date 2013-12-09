@@ -116,6 +116,12 @@ public class SMSXposed implements IXposedHookZygoteInit, IXposedHookLoadPackage,
 					return;
 				}
 				
+				XSharedPreferences prefs = new XSharedPreferences(PACKAGE_NAME);
+   		     	if (prefs.getBoolean("replace_package_name", false)==true)
+   		     	{
+   		     		return;
+   		     	}
+				
 				Context context = (Context) XposedHelpers.getObjectField(param.thisObject, "mContext");
     			
 				if (context.getPackageName().equals("com.android.mms")||context.getPackageName().equals("com.google.android.talk"))
@@ -161,11 +167,12 @@ public class SMSXposed implements IXposedHookZygoteInit, IXposedHookLoadPackage,
          					mNotificationHAsBeenAlreadyIntercepted=false;
          				}
          			}, 250);
-            		if (((String)param.args[1]).equals("android.permission.RECEIVE_SMS"))
+             		String permission = (String)param.args[1];
+            		if ((permission!=null)&&permission.equals("android.permission.RECEIVE_SMS"))
             		{
     	        		Context context = (Context)param.thisObject;
     	        		
-    	        		Log.i("SMSXposed","sendOrderedBroadcast hooked "+(String)param.args[1]+" ,"+context.getPackageName());
+    	        		Log.i("SMSXposed","sendOrderedBroadcast hooked "+permission+" ,"+context.getPackageName());
     					
     					interceptAndSaveSMSInformations(context,(Intent)param.args[0]);
     					
@@ -173,7 +180,41 @@ public class SMSXposed implements IXposedHookZygoteInit, IXposedHookLoadPackage,
             		}
             	}
 			}
-        });  	
+        }); 
+        findAndHookMethod(contextClass, "getPackageName", new XC_MethodHook() 
+        {
+        	@Override
+    		protected void afterHookedMethod(MethodHookParam param) throws Throwable 
+    		{	
+        		if (((String)param.getResult()).equals("com.stephapps.smsxposed"))
+        		{
+        			 XSharedPreferences prefs = new XSharedPreferences(PACKAGE_NAME);
+        		     if (prefs.getBoolean("replace_package_name", false)==true)
+        		     {
+        		    	 param.setResult(prefs.getString("package_name_to_replace", ""));
+        		    	 Log.i("SMSXposed","replaced packageName"+prefs.getString("package_name_to_replace", ""));
+        		     }
+        		}
+    		}
+        });  
+        
+        
+        final Class<?> contextClassParcel = XposedHelpers.findClass("android.os.Parcel", null);
+        XposedBridge.hookAllMethods(contextClassParcel, "readExceptionCode", new XC_MethodHook() 
+        {
+        	@Override
+    		protected void afterHookedMethod(MethodHookParam param) throws Throwable 
+    		{
+        		XSharedPreferences prefs = new XSharedPreferences(PACKAGE_NAME);
+	   		    if ((		prefs.getBoolean("replace_package_name", false)==true)
+	   		    		&&	((Integer)param.getResult()==-1) )//-1 MEANS SECURITY EXCEPTION AND WE WANT TO ACT MOMENTARILY AS THE ORIGINAL APP
+	   		    {
+	   		    	Log.i("SMSXposed","readException cancelled");
+	   		    	param.setResult(0);//0 == NO EXCEPTION
+	   		    	
+	   		    }
+    		}
+        });
 	}
 
 	 @Override
@@ -354,6 +395,7 @@ public class SMSXposed implements IXposedHookZygoteInit, IXposedHookLoadPackage,
 	 		showIntent.putExtra("content_text", notificationsText[2]);
 	 		showIntent.putExtra("notification_id", notificationId);
 	 		showIntent.putExtra("notification", paramNotif);
+	 		showIntent.putExtra("package_name", context.getPackageName());
 	 		showIntent.setAction("com.stephapps.smsxposed.shownotification_receiver");
 			PendingIntent pendingShowIntent = PendingIntent.getBroadcast(context, 0, showIntent, PendingIntent.FLAG_UPDATE_CURRENT);		    	     
 	
