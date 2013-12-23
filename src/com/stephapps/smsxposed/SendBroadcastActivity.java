@@ -14,7 +14,7 @@ public class SendBroadcastActivity extends Activity {
 	    Log.i("SendBroadCastActivity","onCreate");
 	    
 	    Intent sendIntent = new Intent();
-		sendIntent.setAction(Constants.SEND_NOTIFICATION_RECEIVER);
+		sendIntent.setAction("android.provider.Telephony.SMS_RECEIVED");
 		sendIntent.putExtras(getIntent().getExtras());
 		sendBroadcast(sendIntent);  
 	    finish();

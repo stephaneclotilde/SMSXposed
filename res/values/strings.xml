@@ -13,7 +13,7 @@
     <string name="privacy_mode_summary">Hides the sender and text message when receiving a SMS notification</string>
     <string name="privacy_show_sender_title">Privacy - show Sender</string>
     <string name="privacy_show_sender_summary">Shows the sender in privacy mode</string>
-    <string name="privacy_add_show_btn_title">Privacy - add Show Button</string>
+    <string name="privacy_add_show_btn_title">(ROOT)Privacy - add Show Button</string>
     <string name="privacy_add_show_btn_summary">The Show button will reveal SMS sender and text and action buttons</string>
     <string name="unlimited_textbox_title">Unlimited Textbox</string>
     <string name="unlimited_textbox_summary">Removes the 3-lines height limit for the SMS typing box</string>
@@ -31,6 +31,7 @@
     <string name="all_sms_apps">All SMS Apps tweaks</string>
     <string name="stock_or_hangouts">AOSP SMS or Hangouts</string>
     <string name="stock_only">AOSP SMS app only</string>
+    <string name="root_needed">Root is needed for this functionnality</string>
      
     <!-- Color Picker -->
     <string name="dialog_color_picker">Color Picker</string>

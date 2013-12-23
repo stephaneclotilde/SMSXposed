@@ -1,15 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
-    <string name="app_name">SMS Xposed</string>
-    <string name="action_settings">Settings</string>
- 	<string name="replace_smiley_title">Enter Key</string>
-    <string name="replace_smiley_summary">Replace Smiley Button with Enter Button </string>
-    <string name="no_fullscreen_title">No Fullscreen</string>
-    <string name="no_fullscreen_summary">Disable Fullscreen for keyboard in Landscape mode </string>
-    <string name="replace_punctuation_title">Voice Punctuation</string>
-    <string name="replace_punctuation_summary">Replace words by corresponding punctuations in voice input</string>
-    
+ 
     <string-array name="punctuation_array">
         <item>puntkomma</item>
         <item>uitroepteken</item>

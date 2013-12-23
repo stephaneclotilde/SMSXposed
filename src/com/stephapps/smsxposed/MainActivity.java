@@ -6,6 +6,7 @@ import java.util.Set;
 
 import com.stephapps.smsxposed.R;
 import com.stephapps.smsxposed.misc.Constants;
+import com.stephapps.smsxposed.misc.PhoneTools;
 
 import android.os.Bundle;
 import android.preference.EditTextPreference;
@@ -81,6 +82,16 @@ public class MainActivity extends Activity
 					edit.putFloat("density", getResources().getDisplayMetrics().density);
 					edit.commit();
 				}
+			}
+			else if (key.equals("privacy_add_show_btn"))
+			{
+//				if (PhoneTools.isAppInstalledAsSystem(getActivity())==false)
+//				{
+//					Toast.makeText(getActivity(), "test", Toast.LENGTH_SHORT).show();
+//					boolean hasMoved= PhoneTools.moveAppToSystemWithRoot(getActivity());
+//					if (hasMoved==false)
+//						Toast.makeText(getActivity(), getString(R.string.root_needed), Toast.LENGTH_SHORT).show();
+//				}
 			}
 		}
 		

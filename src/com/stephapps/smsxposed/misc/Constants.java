@@ -17,6 +17,6 @@ public final class Constants {
 	public static final String NOTIFICATION_ACTIONS = "notification_actions";
 	
 	public static final String SEND_NOTIFICATION_RECEIVER = "SEND_NOTIFICATION_RECEIVER";
-    
+    public static final String SMS_XPOSED_IDENTIFIER = "SMS_XPOSED_IDENTIFIER";
 
 }
