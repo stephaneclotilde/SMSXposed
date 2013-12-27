@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -81,6 +82,7 @@ public class ShowNotificationReceiver extends BroadcastReceiver
  				Intent respondIntent = new Intent(); 
  				respondIntent.putExtra("sms_sender", smsSender);
  				respondIntent.putExtra("sms_msg", smsMsg);
+ 				respondIntent.putExtra("notification_id", notificationId);
  				respondIntent.setAction("com.stephapps.smsxposed.quickresponse_receiver");
  				PendingIntent pendingRespondIntent = PendingIntent.getBroadcast(context, 0, respondIntent, PendingIntent.FLAG_UPDATE_CURRENT);		    	     
  		
@@ -128,6 +130,8 @@ public class ShowNotificationReceiver extends BroadcastReceiver
  			}
  		}
  		
+ //		if ((Build.VERSION.SDK_INT <= android.os.Build.VERSION_CODES.JELLY_BEAN)&&(paramNotif.bigContentView!=null))
+//			newNotif.bigContentView = paramNotif.bigContentView;
 		NotificationManager notificationManager = (NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);
 		notificationManager.notify(notificationId,newNotif);
 		

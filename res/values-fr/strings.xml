@@ -30,6 +30,7 @@
     <string name="stock_or_hangouts">SMS AOSP ou Hangouts</string>
     <string name="stock_only">Seulement l\'appli SMS AOSP</string>
     <string name="root_needed">Le root est nécessaire pour cette fonctionnalité</string>
+    <string name="marked_as_read">Marqué comme lu</string>
     
     <!-- Color Picker -->
     <string name="dialog_color_picker">Sélecteur de couleur</string>
