@@ -1,23 +1,25 @@
 package com.stephapps.smsxposed;
 
-import com.stephapps.smsxposed.misc.SMSTools;
-
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.KeyguardManager;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.IntentFilter;
-import android.graphics.Color;
+import android.content.DialogInterface.OnCancelListener;
 import android.os.Bundle;
 import android.text.Editable;
 import android.util.Log;
 import android.widget.EditText;
 
+import com.stephapps.smsxposed.misc.SMSTools;
+
 public class QuickResponseDialogActivity extends Activity {
 
 	String mSMSSender = null, mSMSMsg = null;
 	int mNotificationId = -1;
+	boolean mKeyGuardHasBeenManuallyDisabled = false;
+	KeyguardManager.KeyguardLock mLock;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +34,14 @@ public class QuickResponseDialogActivity extends Activity {
 
 	private void displayAlert()
 	{
+		KeyguardManager  keyGuard = (KeyguardManager)getSystemService(Context.KEYGUARD_SERVICE);
+		if (keyGuard.isKeyguardLocked()&&!keyGuard.isKeyguardSecure())
+		{
+			mLock = keyGuard.newKeyguardLock("tagName");
+			mLock.disableKeyguard();
+			mKeyGuardHasBeenManuallyDisabled=true;
+		}
+		
 		String contactName = SMSTools.getContactName(this, mSMSSender);
 		if (contactName==null) contactName = mSMSSender;
 		// Set an EditText view to get user input 
@@ -40,8 +50,10 @@ public class QuickResponseDialogActivity extends Activity {
 	    .setTitle("Respond to SMS")
 	    .setMessage(getString(R.string.to_recipe)+contactName)
 	    .setView(input)
-	    .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-	        public void onClick(DialogInterface dialog, int whichButton) {
+	    .setPositiveButton("Ok", new DialogInterface.OnClickListener() 
+	    {
+	        public void onClick(DialogInterface dialog, int whichButton) 
+	        {
 	            Editable response = input.getText(); 
 	            Context context = QuickResponseDialogActivity.this.getApplicationContext();
 	            SMSTools.sendSMS(context, mSMSSender, response.toString());
@@ -52,13 +64,23 @@ public class QuickResponseDialogActivity extends Activity {
 	     	   
 	            dialog.cancel();
                 finish();
+                
+ //               if (mKeyGuardHasBeenManuallyDisabled) mLock.reenableKeyguard();
 	        }
 	    }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
 	        public void onClick(DialogInterface dialog, int whichButton) {
 	        	dialog.cancel();
-                finish();
+//	        	if (mKeyGuardHasBeenManuallyDisabled) mLock.reenableKeyguard();	        	 
+                finish();              
 	        }
-	    }).show();	
+	    })
+	    .setOnCancelListener(new OnCancelListener() {	
+			@Override
+			public void onCancel(DialogInterface dialog) {
+//				if (mKeyGuardHasBeenManuallyDisabled) mLock.reenableKeyguard();	        	 
+                finish();
+			}
+		})
+		.show();		
 	}
-
 }

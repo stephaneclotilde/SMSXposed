@@ -49,7 +49,7 @@ public class ShowNotificationReceiver extends BroadcastReceiver
 	 		showIntent.putExtra("add_show_btn", false);
 	 		showIntent.putExtra("sms_sender", smsSender);
 	 		showIntent.putExtra("sms_msg", smsMsg);
-	 		showIntent.putExtra("package_name", context.getPackageName());
+	 		showIntent.putExtra("package_name", extras.getString("package_name"));
 	 		showIntent.putExtra("ticker", paramNotif.tickerText);
 	 		showIntent.putExtra("content_title", extras.getCharSequence("content_title"));
 	 		showIntent.putExtra("content_text", extras.getCharSequence("content_text"));
@@ -90,6 +90,7 @@ public class ShowNotificationReceiver extends BroadcastReceiver
  				markAsReadIntent.putExtra("sms_sender", smsSender);
  				markAsReadIntent.putExtra("sms_msg", smsMsg);
  				markAsReadIntent.putExtra("notification_id", notificationId);
+ 				markAsReadIntent.putExtra("package_name", extras.getString("package_name"));
  				markAsReadIntent.setAction("com.stephapps.smsxposed.markasread_receiver");
  			    PendingIntent pendingIntentMarkAsRead = PendingIntent.getBroadcast(context, 0, markAsReadIntent, PendingIntent.FLAG_UPDATE_CURRENT);
  		
