@@ -39,7 +39,7 @@ public class MarkAsReadReceiver extends BroadcastReceiver{
 		{
 			Intent i = new Intent();
 			i.putExtras(extras);
-			i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TASK);
+			i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
 			
 			if (extras.getString("package_name").equals("com.android.mms"))
 				i.setComponent(new ComponentName("com.android.mms", "com.android.mms.ui.ComposeMessageActivity"));
