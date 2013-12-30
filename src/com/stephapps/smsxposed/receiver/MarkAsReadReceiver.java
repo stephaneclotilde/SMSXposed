@@ -30,22 +30,29 @@ public class MarkAsReadReceiver extends BroadcastReceiver{
         
 		PhoneTools.hideStatusBar(context);
 		
-		if ((Build.VERSION.SDK_INT <= android.os.Build.VERSION_CODES.JELLY_BEAN_MR1))
+		if ((Build.VERSION.SDK_INT <= 18))//inferior to kitkat
 	    {
 			SMSTools.markMessageRead(context, extras.getString("sms_sender"), extras.getString("sms_msg"));
 			Toast.makeText(context, "mark as read", Toast.LENGTH_SHORT).show();
 	    }
 		else
 		{
+//			Intent i = new Intent();
+//			i.putExtras(extras);
+//			i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
+//			
+//			if (extras.getString("package_name").equals("com.android.mms"))
+//				i.setComponent(new ComponentName("com.android.mms", "com.android.mms.ui.ComposeMessageActivity"));
+//			else // HANGOUTS
+//				i.setComponent(new ComponentName("com.google.android.talk", "com.google.android.apps.babel.phone.BabelHomeActivity"));
+//			context.startActivity(i);
 			Intent i = new Intent();
 			i.putExtras(extras);
-			i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
-			
 			if (extras.getString("package_name").equals("com.android.mms"))
-				i.setComponent(new ComponentName("com.android.mms", "com.android.mms.ui.ComposeMessageActivity"));
-			else // HANGOUTS
-				i.setComponent(new ComponentName("com.google.android.talk", "com.google.android.apps.babel.phone.BabelHomeActivity"));
-			context.startActivity(i);
+				i.setAction("com.android.mms.transaction.MessageStatusReceiver.MESSAGE_STATUS_RECEIVED");
+			else
+				i.setAction("com.google.android.apps.babel.realtimechat.reset_error_notifications");
+			context.sendBroadcast(i);
 		}
 	 } 
 }

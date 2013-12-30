@@ -323,10 +323,10 @@ public class SMSXposed implements IXposedHookZygoteInit, IXposedHookLoadPackage,
     	
     	if (addButtons)
     	{
-		    	findAndHookMethod("com.android.mms.ui.ComposeMessageActivity", lpparam.classLoader,  "onResume",  new XC_MethodHook(){
+		    	findAndHookMethod("com.android.mms.transaction.MessageStatusReceiver", lpparam.classLoader, "onReceive", Context.class, Intent.class, new XC_MethodHook(){
 		    		@Override
 		    		protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-		    			Log.i("SMSXposed","ComposeMessageActivity onResume hooked");
+		    			Log.i("SMSXposed","MessageStatusReceiver onReceive hooked");
 		    			markAsReadAndCloseApp( param);
 		     		}
 		    	});
@@ -337,10 +337,10 @@ public class SMSXposed implements IXposedHookZygoteInit, IXposedHookLoadPackage,
     {
     	if ( prefs.getBoolean("add_buttons", false)==true)
     	{
-	    	findAndHookMethod("com.google.android.apps.babel.phone.BabelHomeActivity", lpparam.classLoader,  "onResume",  new XC_MethodHook(){
+	    	findAndHookMethod("com.google.android.apps.babel.realtimechat.NotificationReceiver", lpparam.classLoader,  "onReceive", Context.class, Intent.class,  new XC_MethodHook(){
 	    		@Override
 	    		protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-	    			Log.i("SMSXposed","BabelHomeActivity onResume hooked");
+	    			Log.i("SMSXposed","NotificationReceiver onResume hooked");
 	    			markAsReadAndCloseApp( param);
 	    		}
 	    	});		
@@ -349,15 +349,16 @@ public class SMSXposed implements IXposedHookZygoteInit, IXposedHookLoadPackage,
     
     private void markAsReadAndCloseApp(MethodHookParam param)
     {
-    	Activity activity = (Activity)param.thisObject;
-    	Bundle extras = activity.getIntent().getExtras();
+    	Context context= (Context)param.args[1];
+    	Intent intent = (Intent)param.args[0];
+    	Bundle extras = intent.getExtras();
     	if ((extras!=null)&&(extras.getString("sms_sender")!=null))
 		{
-			SMSTools.markMessageRead(activity, extras.getString("sms_sender"), extras.getString("sms_msg"));
-			Toast.makeText(activity, "marked as read", Toast.LENGTH_SHORT).show();
-			activity.getIntent().removeExtra("sms_sender");
+			SMSTools.markMessageRead(context, extras.getString("sms_sender"), extras.getString("sms_msg"));
+			Toast.makeText(context, "marked as read", Toast.LENGTH_SHORT).show();
+			intent.removeExtra("sms_sender");
 			param.setResult(0);
-			((Activity)param.thisObject).finish();   
+			//((Activity)param.thisObject).finish();   
 		}
     }
     
