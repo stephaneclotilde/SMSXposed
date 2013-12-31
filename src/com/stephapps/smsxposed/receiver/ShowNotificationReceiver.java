@@ -83,6 +83,7 @@ public class ShowNotificationReceiver extends BroadcastReceiver
  				respondIntent.putExtra("sms_sender", smsSender);
  				respondIntent.putExtra("sms_msg", smsMsg);
  				respondIntent.putExtra("notification_id", notificationId);
+ 				respondIntent.putExtra("package_name", extras.getString("package_name"));	
  				respondIntent.setAction("com.stephapps.smsxposed.quickresponse_receiver");
  				PendingIntent pendingRespondIntent = PendingIntent.getBroadcast(context, 0, respondIntent, PendingIntent.FLAG_UPDATE_CURRENT);		    	     
  		

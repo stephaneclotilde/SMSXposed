@@ -6,6 +6,7 @@ import android.app.KeyguardManager;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.DialogInterface.OnCancelListener;
 import android.os.Bundle;
 import android.text.Editable;
@@ -14,20 +15,23 @@ import android.widget.EditText;
 
 import com.stephapps.smsxposed.misc.SMSTools;
 
-public class QuickResponseDialogActivity extends Activity {
+public class QuickResponseDialogActivity extends Activity 
+{
 
-	String mSMSSender = null, mSMSMsg = null;
+	String mSMSSender = null, mSMSMsg = null, mPackageName = null;
 	int mNotificationId = -1;
 	boolean mKeyGuardHasBeenManuallyDisabled = false;
 	KeyguardManager.KeyguardLock mLock;
 	
 	@Override
-	protected void onCreate(Bundle savedInstanceState) {
+	protected void onCreate(Bundle savedInstanceState) 
+	{
 	    super.onCreate(savedInstanceState);
 	    Log.i("QuickResponseDialogActivity","onCreate");
 	    Bundle extras = getIntent().getExtras();
 	    mSMSSender = extras.getString("sms_sender");
 	    mSMSMsg = extras.getString("sms_msg");
+	    mPackageName = extras.getString("package_name");
 	    mNotificationId = extras.getInt("notification_id");
 	    displayAlert();
 	}
@@ -57,7 +61,9 @@ public class QuickResponseDialogActivity extends Activity {
 	            Editable response = input.getText(); 
 	            Context context = QuickResponseDialogActivity.this.getApplicationContext();
 	            SMSTools.sendSMS(context, mSMSSender, response.toString());
-	            SMSTools.markMessageRead(context,mSMSSender , mSMSMsg);
+//	            SMSTools.markMessageRead(context,mSMSSender , mSMSMsg);
+	            
+	            markMsgAsRead();
 	            
 	            NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 	            notificationManager.cancel(mNotificationId);
@@ -82,5 +88,16 @@ public class QuickResponseDialogActivity extends Activity {
 			}
 		})
 		.show();		
+	}
+	
+	private void markMsgAsRead()
+	{
+		Intent markAsReadIntent = new Intent();
+		markAsReadIntent.putExtra("sms_sender", mSMSSender);
+		markAsReadIntent.putExtra("sms_msg", mSMSMsg);
+		markAsReadIntent.putExtra("notification_id", mNotificationId);
+		markAsReadIntent.putExtra("package_name", mPackageName);
+		markAsReadIntent.setAction("com.stephapps.smsxposed.markasread_receiver");
+		sendBroadcast(markAsReadIntent);
 	}
 }

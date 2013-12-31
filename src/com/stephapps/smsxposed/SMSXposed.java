@@ -349,8 +349,8 @@ public class SMSXposed implements IXposedHookZygoteInit, IXposedHookLoadPackage,
     
     private void markAsReadAndCloseApp(MethodHookParam param)
     {
-    	Context context= (Context)param.args[1];
-    	Intent intent = (Intent)param.args[0];
+    	Context context= (Context)param.args[0];
+    	Intent intent = (Intent)param.args[1];
     	Bundle extras = intent.getExtras();
     	if ((extras!=null)&&(extras.getString("sms_sender")!=null))
 		{
@@ -371,6 +371,7 @@ public class SMSXposed implements IXposedHookZygoteInit, IXposedHookLoadPackage,
 		Intent respondIntent = new Intent(); 
 		respondIntent.putExtra("sms_sender", smsSender);
 		respondIntent.putExtra("sms_msg", smsMsg);
+		respondIntent.putExtra("package_name", context.getPackageName());	
 		respondIntent.setAction("com.stephapps.smsxposed.quickresponse_receiver");
 		PendingIntent pendingRespondIntent = PendingIntent.getBroadcast(context, 0, respondIntent, PendingIntent.FLAG_UPDATE_CURRENT);		    	     
 
