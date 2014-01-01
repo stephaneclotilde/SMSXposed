@@ -19,6 +19,8 @@
     <string name="unlimited_textbox_summary">Enlève la limite de 3 lignes de hauteur pour le cadre d\'édition de SMS </string>
     <string name="wake_on_new_SMS_title">Allumage lors d\'un nouveau SMS</string>
     <string name="wake_on_new_SMS_summary">Allume l\'écran lors de la récéption d\'un nouveau SMS</string>
+    <string name="flash_flashlight_title">Activer flash</string>
+    <string name="flash_flashlight_summary">Activer le flash lors de la récéption d\'un nouveau SMS</string>
     <string name="sms_icon_color_title">Choisir la couleur de l\'icone SMS</string>
     <string name="sms_icon_color_summary">Choisir la couleur de l\'icone SMS dans la barre de statut</string>
     <string name="add_buttons_title">Boutons de notifications</string>

@@ -1,21 +1,27 @@
 package com.stephapps.smsxposed.receiver;
 
+import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.hardware.Camera;
+import android.hardware.Camera.Parameters;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 
 import com.stephapps.smsxposed.R;
 
-public class ShowNotificationReceiver extends BroadcastReceiver
+public class DisplayNotificationReceiver extends BroadcastReceiver
 {
+	@SuppressLint("NewApi")
 	@Override
 	public void onReceive(Context context, Intent intent) 
 	{
@@ -29,6 +35,7 @@ public class ShowNotificationReceiver extends BroadcastReceiver
 		boolean showSender = extras.getBoolean("show_sender");
 		boolean showNotificationAction = extras.getBoolean("show_notification_action");
 		
+		final String bigText = extras.getString("big_text", null);
 		final String smsMsg = extras.getString("sms_msg", null);
     	final String smsSender = extras.getString("sms_sender", null);
     	Log.i("ShowNotificationReceiver","msg:"+smsMsg+", sender:"+smsSender);		
@@ -36,8 +43,7 @@ public class ShowNotificationReceiver extends BroadcastReceiver
  		if (!showSender) 	sender = extras.getCharSequence("content_title");
  		else 				sender = "    ";
 
- 		Notification newNotif;
- 		
+ 		Notification.Builder notifBuilder;
  		if (addShowBtn)
  		{
 
@@ -55,7 +61,7 @@ public class ShowNotificationReceiver extends BroadcastReceiver
 	 		showIntent.putExtra("content_text", extras.getCharSequence("content_text"));
   	 		PendingIntent pendingShowIntent = PendingIntent.getBroadcast(context, 0, showIntent, PendingIntent.FLAG_UPDATE_CURRENT );		
  	 		
-			newNotif = new Notification.Builder(context)
+  	 		notifBuilder = new Notification.Builder(context)
 			.setWhen(paramNotif.when)
 	        .setTicker("    ")
 	        .setLargeIcon(paramNotif.largeIcon)
@@ -68,8 +74,7 @@ public class ShowNotificationReceiver extends BroadcastReceiver
 	        .setDefaults(paramNotif.defaults)
 	        .setDeleteIntent(paramNotif.deleteIntent)
 	        .setContentText("    ")
-	        .addAction(android.R.drawable.ic_menu_view, context.getResources().getStringArray(R.array.action_buttons_array)[3], pendingShowIntent)
-	        .build();
+	        .addAction(android.R.drawable.ic_menu_view, context.getResources().getStringArray(R.array.action_buttons_array)[3], pendingShowIntent);
  		}
  		else
  		{
@@ -95,7 +100,7 @@ public class ShowNotificationReceiver extends BroadcastReceiver
  				markAsReadIntent.setAction("com.stephapps.smsxposed.markasread_receiver");
  			    PendingIntent pendingIntentMarkAsRead = PendingIntent.getBroadcast(context, 0, markAsReadIntent, PendingIntent.FLAG_UPDATE_CURRENT);
  		
- 				newNotif = new Notification.Builder(context)
+ 				notifBuilder = new Notification.Builder(context)
  				.setWhen(paramNotif.when)
  		        .setTicker(extras.getCharSequence("ticker"))
  		        .setLargeIcon(paramNotif.largeIcon)
@@ -106,17 +111,16 @@ public class ShowNotificationReceiver extends BroadcastReceiver
  		        .setPriority(paramNotif.priority)
  		        .setAutoCancel(true)
  	//	        .setSound(paramNotif.sound)
- 	//	        .setDefaults(paramNotif.defaults)
+ 	//	        .setDefaults(paramNotif.defaults)	       
  		        .setDeleteIntent(paramNotif.deleteIntent)
  		        .setContentText(extras.getCharSequence("content_text"))
  		        .addAction(android.R.drawable.ic_menu_call, actions[0], pendingCallIntent)
  		        .addAction(android.R.drawable.ic_menu_send, actions[1], pendingRespondIntent)
- 		        .addAction(android.R.drawable.checkbox_on_background, actions[2], pendingIntentMarkAsRead)
- 		        .build();
+ 		        .addAction(android.R.drawable.checkbox_on_background, actions[2], pendingIntentMarkAsRead);
  			}
  			else
  			{
- 				newNotif = new Notification.Builder(context)
+ 				notifBuilder = new Notification.Builder(context)
  				.setWhen(paramNotif.when)
  		        .setTicker(extras.getCharSequence("ticker"))
  		        .setLargeIcon(paramNotif.largeIcon)
@@ -127,15 +131,20 @@ public class ShowNotificationReceiver extends BroadcastReceiver
  	//	        .setDefaults(paramNotif.defaults)
  		        .setAutoCancel(true)
  		        .setDeleteIntent(paramNotif.deleteIntent)
- 		        .setContentText(extras.getCharSequence("content_text"))
- 		        .build();		
+ 		        .setContentText(extras.getCharSequence("content_text"));		
  			}
+ 			
+ 			if ( (bigText!=null) && (!bigText.equals("")) )
+					notifBuilder.setStyle(new Notification.BigTextStyle().bigText(extras.getCharSequence("big_text"))); 			
  		}
+ 		
+ 		Notification newNotif = notifBuilder.build();
  		
  //		if ((Build.VERSION.SDK_INT <= android.os.Build.VERSION_CODES.JELLY_BEAN)&&(paramNotif.bigContentView!=null))
 //			newNotif.bigContentView = paramNotif.bigContentView;
 		NotificationManager notificationManager = (NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);
-		notificationManager.notify(notificationId,newNotif);
-		
+		notificationManager.notify(notificationId,newNotif);	
 	}
+	
+	
 }

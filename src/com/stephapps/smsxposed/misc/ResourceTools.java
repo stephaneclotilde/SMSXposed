@@ -39,7 +39,13 @@ public class ResourceTools {
 	    {
 	         e.printStackTrace();
 	    }
-	}  
+	} 
+	
+	public static void appendNoteOnSD(String sFileName, String sBody)
+	{
+	    String existingString = readFile("SMSXposed/"+sFileName);
+	    generateNoteOnSD(sFileName,existingString+sBody);
+	} 
 	
 	public static String readFile(String sFilePath)
 	{
@@ -61,9 +67,11 @@ public class ResourceTools {
 		        text.append(line);
 		        text.append('\n');
 		    }
+		    br.close();
 		}
 		catch (IOException e) {
 		    e.printStackTrace();
+		    return null;
 		}
 		
 		return text.toString();

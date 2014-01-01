@@ -19,6 +19,8 @@
     <string name="unlimited_textbox_summary">Removes the 3-lines height limit for the SMS typing box</string>
     <string name="wake_on_new_SMS_title">Wake on new SMS</string>
     <string name="wake_on_new_SMS_summary">Turns the screen on when receiving a new sms</string>
+    <string name="flash_flashlight_title">Flash flashlight</string>
+    <string name="flash_flashlight_summary">Flash the flashlight when receiving a new sms</string>
     <string name="sms_icon_color_title">Choose SMS icon color</string>
     <string name="sms_icon_color_summary">Choose the color of the sms icon in the status bar</string>
     <string name="add_buttons_title">Notification buttons</string>

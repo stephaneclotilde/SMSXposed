@@ -20,7 +20,7 @@ public class QuickResponseReceiver  extends BroadcastReceiver{
 	    	       
 		Intent quickResponseIntent = new Intent(context,QuickResponseDialogActivity.class);
 		quickResponseIntent.putExtras(intent.getExtras());
-		quickResponseIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		quickResponseIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
 		context.getApplicationContext().startActivity(quickResponseIntent);
 	}
 }

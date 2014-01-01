@@ -3,10 +3,16 @@
 
      <PreferenceCategory android:title="@string/all_sms_apps">
      	  <CheckBoxPreference
-        android:defaultValue="false"
-        android:key="wake_on_new_sms"
-        android:summary="@string/wake_on_new_SMS_summary"
-        android:title="@string/wake_on_new_SMS_title" />
+		        android:defaultValue="false"
+		        android:key="wake_on_new_sms"
+		        android:summary="@string/wake_on_new_SMS_summary"
+		        android:title="@string/wake_on_new_SMS_title" />
+     	  
+     	  <CheckBoxPreference
+		        android:defaultValue="false"
+		        android:key="flash_flashlight"
+		        android:summary="@string/flash_flashlight_summary"
+		        android:title="@string/flash_flashlight_title" />
      </PreferenceCategory>
      
      <PreferenceCategory android:title="@string/stock_or_hangouts">

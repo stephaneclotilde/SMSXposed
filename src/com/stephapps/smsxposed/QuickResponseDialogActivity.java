@@ -48,11 +48,17 @@ public class QuickResponseDialogActivity extends Activity
 		
 		String contactName = SMSTools.getContactName(this, mSMSSender);
 		if (contactName==null) contactName = mSMSSender;
+		
+
+		String smsMsg = mSMSMsg;
+		if (smsMsg.length()>140) smsMsg = smsMsg.subSequence(0, 140)+"...";
+		String message = contactName+": "+smsMsg;
+
 		// Set an EditText view to get user input 
 		final EditText input = new EditText(this);
 		new AlertDialog.Builder(this)
 	    .setTitle("Respond to SMS")
-	    .setMessage(getString(R.string.to_recipe)+contactName)
+	    .setMessage(message)
 	    .setView(input)
 	    .setPositiveButton("Ok", new DialogInterface.OnClickListener() 
 	    {
@@ -61,12 +67,9 @@ public class QuickResponseDialogActivity extends Activity
 	            Editable response = input.getText(); 
 	            Context context = QuickResponseDialogActivity.this.getApplicationContext();
 	            SMSTools.sendSMS(context, mSMSSender, response.toString());
-//	            SMSTools.markMessageRead(context,mSMSSender , mSMSMsg);
 	            
-	            markMsgAsRead();
+	            markMsgAsRead();//notification will be canceled too with this function
 	            
-	            NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-	            notificationManager.cancel(mNotificationId);
 	     	   
 	            dialog.cancel();
                 finish();

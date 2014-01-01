@@ -1,14 +1,11 @@
 package com.stephapps.smsxposed.receiver;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-
+import com.stephapps.smsxposed.R;
 import com.stephapps.smsxposed.misc.PhoneTools;
 import com.stephapps.smsxposed.misc.SMSTools;
 
 import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
@@ -33,7 +30,6 @@ public class MarkAsReadReceiver extends BroadcastReceiver{
 		if ((Build.VERSION.SDK_INT <= 18))//inferior to kitkat
 	    {
 			SMSTools.markMessageRead(context, extras.getString("sms_sender"), extras.getString("sms_msg"));
-			Toast.makeText(context, "mark as read", Toast.LENGTH_SHORT).show();
 	    }
 		else
 		{
@@ -54,5 +50,8 @@ public class MarkAsReadReceiver extends BroadcastReceiver{
 				i.setAction("com.google.android.apps.babel.realtimechat.reset_error_notifications");
 			context.sendBroadcast(i);
 		}
+		
+		Toast.makeText(context, context.getString(R.string.marked_as_read), Toast.LENGTH_SHORT).show();
+		
 	 } 
 }
