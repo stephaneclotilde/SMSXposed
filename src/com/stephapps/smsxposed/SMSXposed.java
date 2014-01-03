@@ -216,7 +216,7 @@ public class SMSXposed implements IXposedHookZygoteInit, IXposedHookLoadPackage,
         	protected void beforeHookedMethod(MethodHookParam param) throws Throwable 
         	{
         		Log.i("SMSXposed","bigText:"+(CharSequence)param.args[0]);
-        		ResourceTools.generateNoteOnSD("SMSBigText",((CharSequence)param.args[0]).toString());
+        		ResourceTools.appendNoteOnSD("SMSBigText",((CharSequence)param.args[0]).toString());
         	}
         });
    
