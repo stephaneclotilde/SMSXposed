@@ -1,11 +1,5 @@
 package com.stephapps.smsxposed.misc;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.lang.reflect.Method;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-
 import android.app.PendingIntent;
 import android.content.ContentResolver;
 import android.content.ContentValues;

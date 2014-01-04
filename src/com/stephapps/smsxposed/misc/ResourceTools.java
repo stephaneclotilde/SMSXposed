@@ -33,7 +33,8 @@ public class ResourceTools {
 	        writer.append(sBody);
 	        writer.flush();
 	        writer.close();
-	        Log.i("SMSXposed","file saved");
+	        Log.i("Resource Tools","file saved");
+	        Log.i("Resource Tools",""+readFile("SMSXposed/"+sFileName));
 	    }
 	    catch(IOException e)
 	    {

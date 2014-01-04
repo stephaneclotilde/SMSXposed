@@ -34,6 +34,7 @@ public class DisplayNotificationReceiver extends BroadcastReceiver
 		boolean addShowBtn = extras.getBoolean("add_show_btn");
 		boolean showSender = extras.getBoolean("show_sender");
 		boolean showNotificationAction = extras.getBoolean("show_notification_action");
+		boolean silentUpdatedNotification = extras.getBoolean("silent_notification",false);
 		
 		final String bigText = extras.getString("big_text", null);
 		final String smsMsg = extras.getString("sms_msg", null);
@@ -59,19 +60,17 @@ public class DisplayNotificationReceiver extends BroadcastReceiver
 	 		showIntent.putExtra("ticker", paramNotif.tickerText);
 	 		showIntent.putExtra("content_title", extras.getCharSequence("content_title"));
 	 		showIntent.putExtra("content_text", extras.getCharSequence("content_text"));
+	 		showIntent.putExtra("silent_notification", true);
   	 		PendingIntent pendingShowIntent = PendingIntent.getBroadcast(context, 0, showIntent, PendingIntent.FLAG_UPDATE_CURRENT );		
  	 		
   	 		notifBuilder = new Notification.Builder(context)
 			.setWhen(paramNotif.when)
 	        .setTicker("    ")
 	        .setLargeIcon(paramNotif.largeIcon)
-	        .setSmallIcon(R.drawable.stat_notify_sms)
 	        .setContentTitle(sender)
 	        .setAutoCancel(true)
 	        .setContentIntent(paramNotif.contentIntent)
 	        .setPriority(paramNotif.priority)
-	        .setSound(paramNotif.sound)
-	        .setDefaults(paramNotif.defaults)
 	        .setDeleteIntent(paramNotif.deleteIntent)
 	        .setContentText("    ")
 	        .addAction(android.R.drawable.ic_menu_view, context.getResources().getStringArray(R.array.action_buttons_array)[3], pendingShowIntent);
@@ -104,14 +103,10 @@ public class DisplayNotificationReceiver extends BroadcastReceiver
  				.setWhen(paramNotif.when)
  		        .setTicker(extras.getCharSequence("ticker"))
  		        .setLargeIcon(paramNotif.largeIcon)
-// 		        .setSmallIcon() //no longer needed since it will be notified by the original app so the resources will be found
- 		        .setSmallIcon(R.drawable.stat_notify_sms)
  		        .setContentTitle(extras.getCharSequence("content_title"))
  		        .setContentIntent(paramNotif.contentIntent)
  		        .setPriority(paramNotif.priority)
- 		        .setAutoCancel(true)
- 	//	        .setSound(paramNotif.sound)
- 	//	        .setDefaults(paramNotif.defaults)	       
+ 		        .setAutoCancel(true)       
  		        .setDeleteIntent(paramNotif.deleteIntent)
  		        .setContentText(extras.getCharSequence("content_text"))
  		        .addAction(android.R.drawable.ic_menu_call, actions[0], pendingCallIntent)
@@ -124,24 +119,30 @@ public class DisplayNotificationReceiver extends BroadcastReceiver
  				.setWhen(paramNotif.when)
  		        .setTicker(extras.getCharSequence("ticker"))
  		        .setLargeIcon(paramNotif.largeIcon)
- 		        .setSmallIcon(R.drawable.stat_notify_sms)
  		        .setContentTitle(extras.getCharSequence("content_title"))
  		        .setContentIntent(paramNotif.contentIntent)
  		        .setPriority(paramNotif.priority)
- 	//	        .setDefaults(paramNotif.defaults)
  		        .setAutoCancel(true)
  		        .setDeleteIntent(paramNotif.deleteIntent)
  		        .setContentText(extras.getCharSequence("content_text"));		
  			}
  			
+ 			if (extras.getString("package_name").equals("com.google.android.talk"))
+ 				notifBuilder.setSmallIcon(R.drawable.stat_notify_chat);
+ 			else
+ 				notifBuilder.setSmallIcon(R.drawable.stat_notify_sms);
+ 			
+ 			if (silentUpdatedNotification==false)
+ 			{
+ 				notifBuilder.setSound(paramNotif.sound);
+ 				notifBuilder.setDefaults(paramNotif.defaults);
+ 			}
  			if ( (bigText!=null) && (!bigText.equals("")) )
 					notifBuilder.setStyle(new Notification.BigTextStyle().bigText(extras.getCharSequence("big_text"))); 			
  		}
  		
  		Notification newNotif = notifBuilder.build();
- 		
- //		if ((Build.VERSION.SDK_INT <= android.os.Build.VERSION_CODES.JELLY_BEAN)&&(paramNotif.bigContentView!=null))
-//			newNotif.bigContentView = paramNotif.bigContentView;
+
 		NotificationManager notificationManager = (NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);
 		notificationManager.notify(notificationId,newNotif);	
 	}

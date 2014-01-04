@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">SMS Xposed</string>
+    <string name="action_settings">设置</string>
+    <string name="replace_smiley_title">回车键</string>
+    <string name="replace_smiley_summary">将表情按钮替换为回车键</string>
+    <string name="no_fullscreen_title">禁用全屏键盘</string>
+    <string name="no_fullscreen_summary">在横屏模式下禁用全屏键盘</string>
+    <string name="replace_punctuation_title">语音输入标点</string>
+    <string name="replace_punctuation_summary">语音输入时将标点名字替换为相应的标点</string>
+    <string name="privacy_mode_title">隐私模式</string>
+    <string name="privacy_mode_summary">在短信通知中隐藏发送者和短信内容</string>
+    <string name="privacy_show_sender_title">隐私 - 显示发送者</string>
+    <string name="privacy_show_sender_summary">在隐私模式中显示发送者</string>
+    <string name="privacy_add_show_btn_title">(ROOT) 隐私 - 增加"显示"按钮</string>
+    <string name="privacy_add_show_btn_summary">点击"显示"按钮可以显示发送者和短信内容</string>
+    <string name="unlimited_textbox_title">无限制输入框</string>
+    <string name="unlimited_textbox_summary">除去短信输入框的三行高度限制</string>
+    <string name="wake_on_new_SMS_title">新短信唤醒</string>
+    <string name="wake_on_new_SMS_summary">收到新短信时点亮屏幕</string>
+    <string name="flash_flashlight_title">闪光灯闪烁</string>
+    <string name="flash_flashlight_summary">收到新短信时闪光灯闪烁</string>
+    <string name="sms_icon_color_title">选择短信图标颜色</string>
+    <string name="sms_icon_color_summary">选择状态栏中短信图标的颜色</string>
+    <string name="add_buttons_title">通知按钮</string>
+    <string name="add_buttons_summary">在短信通知中增加"回复"，"呼叫"和"已读"按钮</string>
+    <string name="sms_custom_icon_color_toggle_title">激活自定义图标颜色</string>
+    <string name="sms_custom_icon_color_toggle_summary"></string>
+    <string name="changes_apply_on_reboot">别忘了重启以使设置生效</string>
+    <string name="crash_toast_text">报告 bug</string>
+    <string name="to_recipe">至: </string>
+    <string name="all_sms_apps">所有短信程序调节</string>
+    <string name="stock_or_hangouts">AOSP 短信及环聊</string>
+    <string name="stock_only">仅 AOSP 短信</string>
+    <string name="root_needed">此功能需要 root 权限</string>
+    <string name="marked_as_read">已读</string>
+     
+    <!-- Color Picker -->
+    <string name="dialog_color_picker">颜色选择器</string>
+    <string name="press_color_to_apply">点击颜色以应用</string>
+    
+    <string-array name="action_buttons_array">
+        <item>呼叫</item>
+        <item>回复</item>
+        <item>已读</item>
+        <item>显示</item>
+    </string-array>
+     
+    <string-array name="punctuation_array">
+        <item>分号</item>
+        <item>感叹号</item>
+        <item>问号</item>
+        <item>逗号</item>
+    </string-array>
+    
+    <string-array name="symbols_array">
+        <item>；</item>
+        <item>！</item>
+        <item>？</item>
+        <item>，</item>
+    </string-array>
+    
+    <string-array name="delayed_punctuation_array">
+        <item>句号</item>
+    </string-array>
+    
+    <string-array name="delayed_symbols_array">
+        <item>。</item>
+    </string-array>
+</resources>
