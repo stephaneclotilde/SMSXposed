@@ -45,9 +45,9 @@ public class DisplayNotificationReceiver extends BroadcastReceiver
  		else 				sender = "    ";
 
  		Notification.Builder notifBuilder;
+ 		
  		if (addShowBtn)
  		{
-
 	 		Intent showIntent = new Intent();
 	 		showIntent.setAction("com.stephapps.smsxposed.shownotification_receiver");
 	 		showIntent.putExtra("notification_id", notificationId);
@@ -127,19 +127,22 @@ public class DisplayNotificationReceiver extends BroadcastReceiver
  		        .setContentText(extras.getCharSequence("content_text"));		
  			}
  			
- 			if (extras.getString("package_name").equals("com.google.android.talk"))
- 				notifBuilder.setSmallIcon(R.drawable.stat_notify_chat);
- 			else
- 				notifBuilder.setSmallIcon(R.drawable.stat_notify_sms);
+ 			if ( (bigText!=null) && (!bigText.equals("")) )
+					notifBuilder.setStyle(new Notification.BigTextStyle().bigText(extras.getCharSequence("big_text"))); 	
  			
  			if (silentUpdatedNotification==false)
- 			{
- 				notifBuilder.setSound(paramNotif.sound);
- 				notifBuilder.setDefaults(paramNotif.defaults);
- 			}
- 			if ( (bigText!=null) && (!bigText.equals("")) )
-					notifBuilder.setStyle(new Notification.BigTextStyle().bigText(extras.getCharSequence("big_text"))); 			
+			{
+				notifBuilder.setSound(paramNotif.sound);
+				notifBuilder.setDefaults(paramNotif.defaults);
+			}
  		}
+ 		
+ 		if (extras.getString("package_name").equals("com.google.android.talk"))
+			notifBuilder.setSmallIcon(R.drawable.stat_notify_chat);
+		else
+			notifBuilder.setSmallIcon(R.drawable.stat_notify_sms);
+			
+			
  		
  		Notification newNotif = notifBuilder.build();
 
