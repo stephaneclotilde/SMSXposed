@@ -2,49 +2,49 @@
 <resources>
 
     <string name="app_name">SMS Xposed</string>
-    <string name="action_settings">Settings</string>
- 	<string name="replace_smiley_title">Enter Key</string>
-    <string name="replace_smiley_summary">Replace Smiley Button with Enter Button </string>
-    <string name="no_fullscreen_title">No Fullscreen</string>
-    <string name="no_fullscreen_summary">Disable Fullscreen for keyboard in Landscape mode </string>
-    <string name="replace_punctuation_title">Voice Punctuation</string>
-    <string name="replace_punctuation_summary">Replace words by corresponding punctuations in voice input</string>
-    <string name="privacy_mode_title">Privacy mode</string>
-    <string name="privacy_mode_summary">Hides the sender and text message when receiving a SMS notification</string>
-    <string name="privacy_show_sender_title">Privacy - show Sender</string>
-    <string name="privacy_show_sender_summary">Shows the sender in privacy mode</string>
-    <string name="privacy_add_show_btn_title">(ROOT)Privacy - add Show Button</string>
-    <string name="privacy_add_show_btn_summary">The Show button will reveal SMS sender and text and action buttons</string>
-    <string name="unlimited_textbox_title">Unlimited Textbox</string>
-    <string name="unlimited_textbox_summary">Removes the 3-lines height limit for the SMS typing box</string>
-    <string name="wake_on_new_SMS_title">Wake on new SMS</string>
-    <string name="wake_on_new_SMS_summary">Turns the screen on when receiving a new sms</string>
-    <string name="flash_flashlight_title">Flash flashlight</string>
-    <string name="flash_flashlight_summary">Flash the flashlight when receiving a new sms</string>
-    <string name="sms_icon_color_title">Choose SMS icon color</string>
-    <string name="sms_icon_color_summary">Choose the color of the sms icon in the status bar</string>
-    <string name="add_buttons_title">Notification buttons</string>
-    <string name="add_buttons_summary">Adds the \'Respond\', \'Call\' and \'Mark as read\' buttons in SMS notifications</string>
-    <string name="sms_custom_icon_color_toggle_title">Activate custom icon color</string>
+    <string name="action_settings">설정</string>
+ 	<string name="replace_smiley_title">엔터 키</string>
+    <string name="replace_smiley_summary">이모티콘 버튼을 엔터키로 변경</string>
+    <string name="no_fullscreen_title">풀스크린 키보드 사용 안함</string>
+    <string name="no_fullscreen_summary">가로모드에서 전체화면 키보드를 사용하지 않습니다. </string>
+    <string name="replace_punctuation_title">음성 입력 맞춤법</string>
+    <string name="replace_punctuation_summary">음성 입력시 맞춤법에 맞는 단어로 교체해 줍니다.</string>
+    <string name="privacy_mode_title">사생활 보호 모드</string>
+    <string name="privacy_mode_summary">상단바 SMS 알림 영역에 보낸사람의 이름과 내용을 표시하지 않습니다.</string>
+    <string name="privacy_show_sender_title">사생활 보호 - 보낸사람 표시</string>
+    <string name="privacy_show_sender_summary">사생활 보호 모드에서 보낸사람 이름을 표시합니다.</string>
+    <string name="privacy_add_show_btn_title">(ROOT)사생활 보호 - 보기 버튼 추가</string>
+    <string name="privacy_add_show_btn_summary">보기 버튼이 수신된 SMS 메시지에 보낸사람 이름과 함께 액션 버튼으로 표시됩니다.</string>
+    <string name="unlimited_textbox_title">제한 없는 입력창</string>
+    <string name="unlimited_textbox_summary">SMS 전송시 입력창의 3줄 높이 제한을 해제합니다.</string>
+    <string name="wake_on_new_SMS_title">새 SMS 수신시 깨어나기</string>
+    <string name="wake_on_new_SMS_summary">새로운 SMS 메시지를 수신하면 화면을 켭니다.</string>
+    <string name="flash_flashlight_title">플래시 라이트 켜기</string>
+    <string name="flash_flashlight_summary">새로운 SMS 메시지를 수신하면 카메라 플래시를 켭니다.</string>
+    <string name="sms_icon_color_title">SMS 아이콘 색상 선택</string>
+    <string name="sms_icon_color_summary">상단바에 표시할 SMS 아이콘 색상을 선택합니다.</string>
+    <string name="add_buttons_title">상단바 알림영역 버튼</string>
+    <string name="add_buttons_summary"> \'답장하기\', \'전화 걸기\' and \'읽은 상태로 표시\' 버튼을 상단바 SMS 알림 영역에 추가합니다.</string>
+    <string name="sms_custom_icon_color_toggle_title">아이콘 색상 변경 사용</string>
     <string name="sms_custom_icon_color_toggle_summary"></string>
-    <string name="changes_apply_on_reboot">Don\'t forget to reboot for changes to take effect</string>
-    <string name="crash_toast_text">bug report</string>
+    <string name="changes_apply_on_reboot">변경된 효과는 재부팅 해야 반영됩니다.</string>
+    <string name="crash_toast_text">버그 리포트</string>
     <string name="to_recipe">To: </string>
-    <string name="all_sms_apps">All SMS Apps tweaks</string>
-    <string name="stock_or_hangouts">AOSP SMS or Hangouts</string>
-    <string name="stock_only">AOSP SMS app only</string>
-    <string name="root_needed">Root is needed for this functionnality</string>
-    <string name="marked_as_read">Marked as read</string>
+    <string name="all_sms_apps">모든 SMS앱 트윅</string>
+    <string name="stock_or_hangouts">AOSP SMS 또는 행아웃</string>
+    <string name="stock_only">AOSP SMS앱 전용</string>
+    <string name="root_needed">이 기능은 루트 권한이 필요합니다.</string>
+    <string name="marked_as_read">읽은 상태로 표시</string>
      
     <!-- Color Picker -->
     <string name="dialog_color_picker">Color Picker</string>
-    <string name="press_color_to_apply">Press on Color to apply</string>   
+    <string name="press_color_to_apply">적용할 색상을 선택하세요.</string>   
     
     <string-array name="action_buttons_array">
-        <item>Call</item>
-        <item>Respond</item>
-        <item>Mark as read</item>
-        <item>Show</item>
+        <item>전화 걸기</item>
+        <item>답장 하기</item>
+        <item>일은 상태로 표시</item>
+        <item>보기</item>
     </string-array>
      
     <string-array name="punctuation_array">
